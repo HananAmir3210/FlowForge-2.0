@@ -1,0 +1,195 @@
+
+import React from 'react';
+import { X, Download, Share, Copy, FileText, Workflow } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { exportSOPToPDF } from '@/utils/pdfExport';
+import WorkflowWhiteboard from '@/components/WorkflowWhiteboard';
+
+interface SOPStep {
+  number: number;
+  title: string;
+  description: string;
+  details: string[];
+}
+
+interface WorkflowStep {
+  id: string;
+  title: string;
+  description: string;
+  type: 'start' | 'process' | 'decision' | 'end';
+  x: number;
+  y: number;
+  connections: string[];
+}
+
+interface SOPContent {
+  title: string;
+  content: string;
+  steps: SOPStep[];
+}
+
+interface SOPPreviewModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  sop: SOPContent;
+  workflow: WorkflowStep[];
+}
+
+const SOPPreviewModal: React.FC<SOPPreviewModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  sop, 
+  workflow 
+}) => {
+  const { toast } = useToast();
+
+  if (!isOpen) return null;
+
+  const handleExportPDF = () => {
+    try {
+      exportSOPToPDF({
+        title: sop.title,
+        steps: sop.steps,
+        generated_content: sop.content
+      });
+      toast({
+        title: "PDF Generated",
+        description: "Your SOP has been exported as a PDF file.",
+      });
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast({
+        title: "Export Failed",
+        description: "Unable to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleShare = () => {
+    console.log('Sharing SOP...');
+  };
+
+  const handleCopy = () => {
+    const sopText = sop.steps.map(step => 
+      `${step.number}. ${step.title}\n   ${step.description}${step.details.length > 0 ? '\n   - ' + step.details.join('\n   - ') : ''}`
+    ).join('\n\n');
+    
+    navigator.clipboard.writeText(sopText);
+    toast({
+      title: "Copied",
+      description: "SOP content copied to clipboard.",
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
+          <div>
+            <h2 className="text-2xl font-bold dark:text-white flex items-center gap-2">
+              <FileText size={24} />
+              {sop.title}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Complete SOP with Visual Workflow</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleCopy}>
+              <Copy size={16} />
+              Copy
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleShare}>
+              <Share size={16} />
+              Share
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportPDF}>
+              <Download size={16} />
+              Export PDF
+            </Button>
+            <Button variant="outline" size="sm" onClick={onClose}>
+              <X size={16} />
+            </Button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 overflow-auto max-h-[calc(90vh-200px)]">
+          <Tabs defaultValue="sop" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="sop">
+                <FileText className="h-4 w-4 mr-2" />
+                SOP Document
+              </TabsTrigger>
+              <TabsTrigger value="workflow">
+                <Workflow className="h-4 w-4 mr-2" />
+                Visual Workflow
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="sop" className="mt-4">
+              <div className="space-y-6">
+                {sop.steps.map((step) => (
+                  <div key={step.number} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-l-4 border-blue-500">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+                        {step.number}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-2">
+                          {step.title}
+                        </h3>
+                        <p className="text-gray-700 dark:text-gray-300 mb-3">
+                          {step.description}
+                        </p>
+                        {step.details && step.details.length > 0 && (
+                          <div className="bg-white dark:bg-gray-600 rounded-md p-3">
+                            <h4 className="font-medium text-sm text-gray-800 dark:text-gray-200 mb-2">Details:</h4>
+                            <ul className="list-disc list-inside space-y-1">
+                              {step.details.map((detail, idx) => (
+                                <li key={idx} className="text-sm text-gray-600 dark:text-gray-400">{detail}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="workflow" className="mt-4">
+              <WorkflowWhiteboard 
+                steps={workflow}
+                title={sop.title}
+                readonly={true}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Footer */}
+        <div className="border-t dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {sop.steps.length} steps • Generated by AI SOP Generator
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleExportPDF}>
+                Export as PDF
+              </Button>
+              <Button size="sm" onClick={onClose}>
+                Done
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SOPPreviewModal;

@@ -1,0 +1,16 @@
+Placeholder for WebM video files
+
+The following video files should be placed in this directory:
+
+1. how-it-works-process.webm - A premium WebM video showing the step-by-step process of AI SOP generation
+2. ai-in-action-demo.webm - A premium WebM video demonstrating AI in action with real-time processing
+
+These videos should be:
+- High quality (1080p or higher)
+- Optimized for web (compressed WebM format)
+- 10-30 seconds in length
+- Looping seamlessly
+- Using brand colors (#003366 deep blue and #66CC99 soft green)
+- Minimal and futuristic aesthetic
+
+For now, the application will fall back to premium Lottie animations if these videos are not available. 
