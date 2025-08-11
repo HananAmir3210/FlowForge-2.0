@@ -66,11 +66,14 @@ const AdminHeader = ({ onMenuClick, sidebarOpen }: AdminHeaderProps) => {
                   </p>
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              {/* <DropdownMenuSeparator />
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-red-600">
+              <DropdownMenuSeparator /> */}
+              <DropdownMenuItem
+                onClick={logout}
+                className="text-red-600 cursor-pointer"
+              >
                 Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
