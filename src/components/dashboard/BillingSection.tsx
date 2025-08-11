@@ -1,40 +1,50 @@
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Check, Loader2, CreditCard, Calendar, RefreshCw } from "lucide-react";
+import { useBilling } from "@/hooks/useBilling";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useAdminAuth } from "../../hooks/useAdminAuth";
 
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Check, Loader2, CreditCard, Calendar, RefreshCw } from 'lucide-react';
-import { useBilling } from '@/hooks/useBilling';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-
-// Stripe Price IDs - Replace with your actual Stripe price IDs
+// // Stripe Price IDs - Replace with your actual Stripe price IDs
 const STRIPE_PRICES = {
-  Pro: 'price_1QdyV0DKyUdKMlwO4P4iBbLy', // Replace with your actual Pro price ID
-  Team: 'price_1QdyV0DKyUdKMlwO4P4iBbLz', // Replace with your actual Team price ID
+  Pro: "price_1QdyV0DKyUdKMlwO4P4iBbLy", // Replace with your actual Pro price ID
+  Team: "price_1QdyV0DKyUdKMlwO4P4iBbLz", // Replace with your actual Team price ID
 };
 
 const plans = [
   {
-    name: 'Free',
-    price: '$0',
-    period: '/month',
-    features: ['5 SOPs per month', 'Basic workflows', 'Email support'],
+    name: "Free",
+    price: "$0",
+    period: "/month",
+    features: ["5 SOPs per month", "Basic workflows", "Email support"],
     priceId: null,
   },
   {
-    name: 'Pro',
-    price: '$29',
-    period: '/month',
-    features: ['Unlimited SOPs', 'Advanced workflows', 'Priority support', 'Team collaboration'],
+    name: "Pro",
+    price: "$29",
+    period: "/month",
+    features: [
+      "Unlimited SOPs",
+      "Advanced workflows",
+      "Priority support",
+      "Team collaboration",
+    ],
     priceId: STRIPE_PRICES.Pro,
   },
   {
-    name: 'Team',
-    price: '$99',
-    period: '/month',
-    features: ['Everything in Pro', 'Admin controls', 'Advanced analytics', 'Custom integrations'],
+    name: "Team",
+    price: "$99",
+    period: "/month",
+    features: [
+      "Everything in Pro",
+      "Admin controls",
+      "Advanced analytics",
+      "Custom integrations",
+    ],
     priceId: STRIPE_PRICES.Team,
   },
 ];
@@ -42,7 +52,13 @@ const plans = [
 const BillingSection = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { billingData, loading, checkSubscription, createCheckout, openCustomerPortal } = useBilling();
+  const {
+    billingData,
+    loading,
+    checkSubscription,
+    createCheckout,
+    openCustomerPortal,
+  } = useBilling();
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loadingInvoices, setLoadingInvoices] = useState(false);
 
@@ -56,16 +72,16 @@ const BillingSection = () => {
     try {
       setLoadingInvoices(true);
       const { data, error } = await supabase
-        .from('invoices')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('invoice_date', { ascending: false })
+        .from("invoices")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("invoice_date", { ascending: false })
         .limit(5);
 
       if (error) throw error;
       setInvoices(data || []);
     } catch (error: any) {
-      console.error('Error loading invoices:', error);
+      console.error("Error loading invoices:", error);
     } finally {
       setLoadingInvoices(false);
     }
@@ -84,15 +100,15 @@ const BillingSection = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const getCurrentPlanData = () => {
-    return plans.find(plan => plan.name === billingData.plan) || plans[0];
+    return plans.find((plan) => plan.name === billingData.plan) || plans[0];
   };
 
   const currentPlan = getCurrentPlanData();
@@ -100,14 +116,14 @@ const BillingSection = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Billing & Subscription</h1>
+        <h1 className="text-3xl font-bold">Billing & Subscription </h1>
         <Button
           variant="outline"
           onClick={checkSubscription}
           disabled={loading}
           className="flex items-center gap-2"
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           Refresh Status
         </Button>
       </div>
@@ -125,9 +141,13 @@ const BillingSection = () => {
             <div>
               <h3 className="text-2xl font-bold">{currentPlan.name} Plan</h3>
               <p className="text-muted-foreground">
-                {currentPlan.price}{currentPlan.period}
+                {currentPlan.price}
+                {currentPlan.period}
                 {billingData.subscription_end && billingData.subscribed && (
-                  <span> • Renews on {formatDate(billingData.subscription_end)}</span>
+                  <span>
+                    {" "}
+                    • Renews on {formatDate(billingData.subscription_end)}
+                  </span>
                 )}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
@@ -136,7 +156,7 @@ const BillingSection = () => {
             </div>
             <div className="flex flex-col items-end gap-2">
               <Badge variant={billingData.subscribed ? "default" : "secondary"}>
-                {billingData.subscribed ? 'Active' : 'Inactive'}
+                {billingData.subscribed ? "Active" : "Inactive"}
               </Badge>
               {billingData.subscribed && (
                 <Button
@@ -162,7 +182,10 @@ const BillingSection = () => {
           {plans.map((plan) => {
             const isCurrent = plan.name === billingData.plan;
             return (
-              <Card key={plan.name} className={isCurrent ? 'border-primary' : ''}>
+              <Card
+                key={plan.name}
+                className={isCurrent ? "border-primary" : ""}
+              >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>{plan.name}</CardTitle>
@@ -182,14 +205,16 @@ const BillingSection = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button 
-                    variant={isCurrent ? "outline" : "default"} 
+                  <Button
+                    variant={isCurrent ? "outline" : "default"}
                     className="w-full"
                     disabled={isCurrent || loading}
                     onClick={() => handlePlanUpgrade(plan.name, plan.priceId)}
                   >
-                    {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                    {isCurrent ? 'Current Plan' : 'Upgrade'}
+                    {loading && (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    )}
+                    {isCurrent ? "Current Plan" : "Upgrade"}
                   </Button>
                 </CardContent>
               </Card>
@@ -212,10 +237,9 @@ const BillingSection = () => {
                 </div>
                 <div>
                   <p className="font-medium">
-                    {billingData.payment_method_last4 ? 
-                      `•••• •••• •••• ${billingData.payment_method_last4}` : 
-                      'Payment method on file'
-                    }
+                    {billingData.payment_method_last4
+                      ? `•••• •••• •••• ${billingData.payment_method_last4}`
+                      : "Payment method on file"}
                   </p>
                   {billingData.payment_method_expiry && (
                     <p className="text-sm text-muted-foreground">
@@ -224,8 +248,8 @@ const BillingSection = () => {
                   )}
                 </div>
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={openCustomerPortal}
                 disabled={loading}
               >
@@ -255,7 +279,10 @@ const BillingSection = () => {
           ) : (
             <div className="space-y-4">
               {invoices.map((invoice) => (
-                <div key={invoice.id} className="flex items-center justify-between">
+                <div
+                  key={invoice.id}
+                  className="flex items-center justify-between"
+                >
                   <div>
                     <p className="font-medium">{invoice.invoice_number}</p>
                     <p className="text-sm text-muted-foreground">
@@ -263,13 +290,17 @@ const BillingSection = () => {
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="font-medium">${(invoice.amount / 100).toFixed(2)}</span>
+                    <span className="font-medium">
+                      ${(invoice.amount / 100).toFixed(2)}
+                    </span>
                     <Badge variant="outline">{invoice.status}</Badge>
                     {invoice.download_url && (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(invoice.download_url, '_blank')}
+                        onClick={() =>
+                          window.open(invoice.download_url, "_blank")
+                        }
                       >
                         Download
                       </Button>

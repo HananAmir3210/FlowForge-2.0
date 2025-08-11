@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -25,6 +25,13 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiesPolicy from "./pages/CookiesPolicy";
 import NotFound from "./pages/NotFound";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminLogin from "./pages/admin/Login";
+import AdminDashboard from "./pages/admin/Dashboard";
+import { AdminAuthProvider } from "./hooks/useAdminAuth";
+import AdminUsers from "./pages/admin/Users";
+import AdminSubscriptions from "./pages/admin/Subscriptions";
+import AdminTransactions from "./pages/admin/Transactions";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,14 +69,32 @@ const App = () => (
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/cookies" element={<CookiesPolicy />} />
-              <Route 
-                path="/dashboard/*" 
+              <Route
+                path="/dashboard/*"
                 element={
                   <ProtectedRoute>
                     <Dashboard />
                   </ProtectedRoute>
-                } 
+                }
               />
+
+              {/* Admin routes - wrapped in AdminAuthProvider */}
+              <Route
+                path="/admin/*"
+                element={
+                  <AdminAuthProvider>
+                    <AdminLayout />
+                  </AdminAuthProvider>
+                }
+              >
+                <Route index element={<Navigate to="/admin/login" replace />} />
+                <Route path="login" element={<AdminLogin />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="subscriptions" element={<AdminSubscriptions />} />
+                <Route path="transactions" element={<AdminTransactions />} />
+              </Route>
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </TooltipProvider>
