@@ -1,1232 +1,1115 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring } from "framer-motion";
+import React, { useState, useCallback, useEffect } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import AuthModal from "@/components/AuthModal";
+import { Separator } from "@/components/ui/separator";
+import { 
+  Bot, 
+  Zap, 
+  Users, 
+  Shield, 
+  ArrowRight, 
+  CheckCircle, 
+  Star, 
+  Play, 
+  FileText, 
+  Workflow, 
+  Download, 
+  Share, 
+  Clock, 
+  Target, 
+  Lightbulb,
+  Twitter,
+  Linkedin,
+  Github,
+  Mail,
+  Phone,
+  MapPin
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { Twitter, Linkedin, Facebook, Star, CheckCircle, Users, Zap, ArrowRight, Bot, Workflow, FileText, Play, ChevronDown, Plus, Minus } from "lucide-react";
-import Lottie from "lottie-react";
-import aiAutomationAnimation from "@/assets/ai-automation.json";
-import hero3dAnimation from "@/assets/hero-3d-automation.json";
-import featuresWorkflowAnimation from "@/assets/features-workflow.json";
-import howItWorksAnimation from "@/assets/how-it-works.json";
-import aiInActionAnimation from "@/assets/ai-in-action.json";
+import AuthModal from "@/components/AuthModal";
+import FeatureModal from "@/components/FeatureModal";
+import PaymentModal from "@/components/PaymentModal";
+import PricingDropdown from "@/components/PricingDropdown";
+import LandingNavbar from "@/components/navigation/LandingNavbar";
+import Lottie from 'lottie-react';
+import SplineScene from '@/components/SplineScene';
+import PremiumVideo from '@/components/PremiumVideo';
 
-import heroGraphic from "@/assets/hero-graphic.png";
-import featuresGraphic from "@/assets/features-graphic.png";
-import howItWorksGraphic from "@/assets/how-it-works-graphic.png";
-import aiInActionGraphic from "@/assets/ai-in-action-graphic.png";
-
-import Navbar from "@/components/Navbar";
-
-// Magnetic hover effect hook
-const useMagneticHover = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  
-  const springConfig = { damping: 15, stiffness: 150 };
-  const springX = useSpring(x, springConfig);
-  const springY = useSpring(y, springConfig);
-  
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!ref.current) return;
-    
-    const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    x.set((e.clientX - centerX) * 0.1);
-    y.set((e.clientY - centerY) * 0.1);
-  }, [x, y]);
-  
-  const handleMouseLeave = useCallback(() => {
-    x.set(0);
-    y.set(0);
-  }, [x, y]);
-  
-  return {
-    ref,
-    style: {
-      x: springX,
-      y: springY,
-    },
-    onMouseMove: handleMouseMove,
-    onMouseLeave: handleMouseLeave,
-  };
-};
-
-// Optimized animation variants - GPU-friendly properties only
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { 
-      duration: 0.6, 
-      ease: [0.4, 0, 0.2, 1] as const
-    } 
-  }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1
-    }
-  }
-};
-
-// Simplified floating animation
-const floatingAnimation = {
-  y: [-5, 5, -5],
-  transition: {
-    duration: 4,
-    repeat: Infinity,
-    ease: [0.4, 0, 0.6, 1] as const
-  }
-};
-
-// Optimized pulse glow - using opacity instead of box-shadow
-const pulseGlow = {
-  opacity: [0.6, 1, 0.6],
-  transition: {
-    duration: 2,
-    repeat: Infinity,
-    ease: [0.4, 0, 0.6, 1] as const
-  }
-};
-
-// Memoized animated section component
-const AnimatedSection = React.memo(({ children, className = "" }: { children: React.ReactNode, className?: string }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={fadeInUp}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-});
-
-AnimatedSection.displayName = 'AnimatedSection';
+// Import Lottie animations
+import heroAnimation from '@/assets/hero-3d-automation.json';
+import featuresAnimation from '@/assets/features-workflow.json';
+import howItWorksAnimation from '@/assets/how-it-works.json';
+import aiInActionAnimation from '@/assets/ai-in-action.json';
 
 const Index = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+  const [authTab, setAuthTab] = useState<'login' | 'signup'>('login');
+  const [selectedFeature, setSelectedFeature] = useState<any>(null);
+  const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [isPricingDropdownOpen, setIsPricingDropdownOpen] = useState(false);
+  const [email, setEmail] = useState("");
   const { user } = useAuth();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  
-  // Optimized scroll transforms - reduced number and simplified ranges
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 300], [0, -30]);
+
+  const { scrollYProgress } = useScroll();
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
   const handleGetStarted = useCallback(() => {
     if (user) {
-      navigate('/dashboard');
+      window.location.href = '/dashboard';
     } else {
+      setAuthTab('signup');
       setIsAuthModalOpen(true);
     }
-  }, [user, navigate]);
+  }, [user]);
 
-  const handleContactSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Message Sent",
-      description: "Thank you for your message. We'll get back to you soon!",
-    });
-    setContactForm({ name: "", email: "", message: "" });
-  }, [toast]);
+  const handleLogin = useCallback(() => {
+    if (user) {
+      window.location.href = '/dashboard';
+    } else {
+      setAuthTab('login');
+      setIsAuthModalOpen(true);
+    }
+  }, [user]);
 
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
-    element?.scrollIntoView({ behavior: 'smooth' });
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   }, []);
 
-  const features = useMemo(() => [
+  const features = [
     {
-      icon: <Bot className="h-8 w-8 text-flowforge-blue" />,
+      icon: Zap,
       title: "AI-Powered Generation",
-      description: "Create comprehensive SOPs instantly with advanced AI that understands your business processes and industry requirements."
+      description: "Transform simple descriptions into comprehensive SOPs using advanced AI technology.",
+      details: "Our AI understands context, industry standards, and best practices to create professional SOPs that would typically take hours to write manually.",
+      example: "Simply describe 'customer onboarding process' and get a complete 12-step SOP with detailed instructions, compliance notes, and quality checkpoints."
     },
     {
-      icon: <Workflow className="h-8 w-8 text-flowforge-blue" />,
-      title: "Visual Workflow Builder",
-      description: "Design and visualize your processes with our intuitive drag-and-drop workflow builder and real-time collaboration tools."
+      icon: Workflow,
+      title: "Visual Workflows",
+      description: "Automatically generate flowcharts and visual representations of your processes.",
+      details: "Every SOP comes with an interactive flowchart that makes complex procedures easy to understand and follow for your team.",
+      example: "A customer support SOP automatically includes a decision tree flowchart showing escalation paths and resolution steps."
     },
     {
-      icon: <Users className="h-8 w-8 text-flowforge-blue" />,
+      icon: Users,
       title: "Team Collaboration",
-      description: "Share, review, and iterate on SOPs with your team in real-time with version control and role-based permissions."
+      description: "Share SOPs with your team, collect feedback, and maintain version control.",
+      details: "Real-time collaboration features allow multiple team members to review, comment, and improve SOPs together.",
+      example: "Team leads can review draft SOPs, add comments, suggest improvements, and approve final versions before implementation."
     },
     {
-      icon: <FileText className="h-8 w-8 text-flowforge-blue" />,
-      title: "Smart Templates",
-      description: "Access industry-specific templates that adapt to your needs, with customizable formats and automated compliance checks."
+      icon: Shield,
+      title: "Enterprise Security",
+      description: "Bank-grade security with SOC 2 compliance and data encryption.",
+      details: "Your sensitive business processes are protected with enterprise-level security measures and compliance standards.",
+      example: "All SOPs are encrypted at rest and in transit, with audit logs tracking every access and modification."
     }
-  ], []);
+  ];
 
-  const pricingPlans = useMemo(() => [
+  const testimonials = [
     {
-      name: "Basic",
-      price: "$9",
-      period: "/month",
-      features: ["5 SOPs per month", "Basic AI templates", "Email support", "PDF export", "Team sharing"],
-      popular: false,
-      cta: "Start Basic"
+      name: "Sarah Johnson",
+      role: "Operations Director",
+      company: "TechCorp Inc.",
+      content: "FlowForge reduced our SOP creation time from weeks to minutes. The AI understands our business context perfectly.",
+      rating: 5,
+      avatar: "SJ"
+    },
+    {
+      name: "Michael Chen",
+      role: "Quality Manager",
+      company: "Manufacturing Plus",
+      content: "The visual workflows are game-changing. Our team finally understands complex processes at a glance.",
+      rating: 5,
+      avatar: "MC"
+    },
+    {
+      name: "Emily Rodriguez",
+      role: "HR Director",
+      company: "StartupXYZ",
+      content: "We've standardized all our HR processes with FlowForge. Onboarding new employees is now seamless.",
+      rating: 5,
+      avatar: "ER"
+    }
+  ];
+
+  const pricingPlans = [
+    {
+      name: "Free",
+      price: "Free",
+      period: "forever",
+      description: "Perfect for individuals getting started",
+      features: [
+        "Up to 3 SOPs per month",
+        "Basic AI generation",
+        "PDF export",
+        "Email support"
+      ],
+      buttonText: "Get Started",
+      popular: false
     },
     {
       name: "Pro",
       price: "$29",
-      period: "/month",
-      features: ["Unlimited SOPs", "Advanced AI generation", "Workflow visualization", "Priority support", "Team collaboration", "Custom branding"],
-      popular: true,
-      cta: "Start Pro"
+      period: "per month",
+      description: "Ideal for small teams and growing businesses",
+      features: [
+        "Unlimited SOPs",
+        "Advanced AI generation",
+        "All export formats",
+        "Visual workflow builder",
+        "Team collaboration",
+        "Priority support"
+      ],
+      buttonText: "Start Free Trial",
+      popular: true
     },
     {
       name: "Enterprise",
       price: "Custom",
-      period: "",
-      features: ["Everything in Pro", "Custom integrations", "Dedicated support", "Advanced analytics", "SSO & compliance", "Custom training"],
-      popular: false,
-      cta: "Contact Sales"
+      period: "pricing",
+      description: "For large organizations with specific needs",
+      features: [
+        "Everything in Pro",
+        "Custom integrations",
+        "Advanced analytics",
+        "Dedicated support",
+        "SLA guarantees",
+        "On-premise deployment"
+      ],
+      buttonText: "Contact Sales",
+      popular: false
     }
-  ], []);
+  ];
 
-  const testimonials = useMemo(() => [
+  const faqs = [
     {
-      name: "Sarah Johnson",
-      role: "Operations Director",
-      company: "TechFlow",
-      content: "Flowforge transformed how we document processes. What used to take weeks now takes hours. The AI understands our workflows perfectly.",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
+      question: "How does the AI generate SOPs?",
+      answer: "Our AI analyzes your process description and applies industry best practices to create comprehensive, step-by-step procedures. It understands context, compliance requirements, and organizational standards."
     },
     {
-      name: "Michael Chen",
-      role: "COO",
-      company: "StreamlineHQ",
-      content: "The workflow visualization feature is game-changing. Our team can finally see the complete picture of our operations.",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
+      question: "Can I customize the generated SOPs?",
+      answer: "Absolutely! Every SOP can be fully edited, customized, and branded to match your organization's style and requirements. You have complete control over the final output."
     },
     {
-      name: "Emily Rodriguez",
-      role: "Quality Manager",
-      company: "Precision Co",
-      content: "Implementation was seamless, and the results were immediate. Our process documentation is now consistent and professional.",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
+      question: "What export formats are supported?",
+      answer: "We support PDF, Word, HTML, and Markdown exports. Enterprise customers also get custom branded templates and bulk export capabilities."
+    },
+    {
+      question: "Is my data secure?",
+      answer: "Yes, we use bank-grade encryption and are SOC 2 compliant. Your data is encrypted at rest and in transit, and we never share your information with third parties."
+    },
+    {
+      question: "Do you offer team collaboration features?",
+      answer: "Yes! Teams can share SOPs, collaborate in real-time, leave comments, track changes, and manage permissions. Perfect for organizations of any size."
     }
-  ], []);
+  ];
 
-  const stats = useMemo(() => [
-    { value: "10,000+", label: "SOPs Created" },
-    { value: "500+", label: "Companies" },
-    { value: "99.9%", label: "Uptime" },
-    { value: "24/7", label: "Support" }
-  ], []);
+  const handleFeatureClick = (feature: any) => {
+    setSelectedFeature(feature);
+    setIsFeatureModalOpen(true);
+  };
 
-  const howItWorksSteps = useMemo(() => [
-    {
-      step: "01",
-      title: "Describe Your Process",
-      description: "Simply describe your business process or workflow in plain English. Our AI understands natural language and extracts the key components automatically.",
-      icon: <FileText className="h-8 w-8 text-flowforge-blue" />
-    },
-    {
-      step: "02", 
-      title: "AI Analysis & Generation",
-      description: "Our advanced AI analyzes your process, identifies best practices, and generates a comprehensive SOP with proper formatting, structure, and compliance guidelines.",
-      icon: <Bot className="h-8 w-8 text-flowforge-blue" />
-    },
-    {
-      step: "03",
-      title: "Review & Customize",
-      description: "Review the generated SOP, make any customizations, and export in your preferred format. Share with your team and track version history.",
-      icon: <Workflow className="h-8 w-8 text-flowforge-blue" />
-    }
-  ], []);
+  const handlePlanSelect = (plan: any) => {
+    setSelectedPlan(plan);
+    setIsPaymentModalOpen(true);
+  };
 
-  const faqData = useMemo(() => [
-    {
-      question: "How accurate is the AI-generated SOP content?",
-      answer: "Our AI has been trained on thousands of industry-standard SOPs and continuously learns from user feedback. The generated content is typically 90-95% accurate and follows best practices for process documentation. You can always review and customize the content before finalizing."
-    },
-    {
-      question: "Can I integrate Flowforge with my existing tools?",
-      answer: "Yes! Flowforge offers integrations with popular tools like Slack, Microsoft Teams, Google Workspace, and project management platforms. We also provide API access for custom integrations with your existing systems."
-    },
-    {
-      question: "What file formats can I export my SOPs in?",
-      answer: "Flowforge supports multiple export formats including PDF, Word documents, HTML, and Markdown. You can also generate shareable links for easy collaboration with your team members."
-    },
-    {
-      question: "Is my data secure and private?",
-      answer: "Absolutely. We use enterprise-grade encryption and security measures to protect your data. All information is stored securely in the cloud with regular backups. We never share your data with third parties."
-    },
-    {
-      question: "Can multiple team members collaborate on the same SOP?",
-      answer: "Yes! Flowforge supports real-time collaboration with features like version control, commenting, and approval workflows. Multiple team members can work on the same document simultaneously with changes tracked and synchronized."
-    },
-    {
-      question: "What industries does Flowforge support?",
-      answer: "Flowforge is designed to work across all industries including manufacturing, healthcare, finance, technology, retail, and more. Our AI adapts to industry-specific terminology and compliance requirements."
-    }
-  ], []);
-
-  const toggleFAQ = useCallback((index: number) => {
-    setOpenFAQ(openFAQ === index ? null : index);
-  }, [openFAQ]);
+  const handleNewsletterSignup = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Newsletter signup:', email);
+    setEmail("");
+  };
 
   return (
-    <div className="min-h-screen overflow-x-hidden relative" style={{ scrollBehavior: 'smooth' }}>
-      {/* --- DYNAMIC BACKGROUND --- */}
-        <motion.div 
-        className="fixed inset-0 -z-10"
-          style={{
-          background: "linear-gradient(135deg, #191970 0%, #000000 100%)"
-          }}
-        />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      {/* Navigation */}
+      <LandingNavbar />
+
+      {/* Hero Section */}
+      <motion.section 
+        id="hero"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden"
+        style={{ y: heroY, opacity: heroOpacity }}
+      >
+        {/* Background with gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-blue via-brand-blue/90 to-brand-green/80" />
         
-      {/* Animated Gradient Overlay */}
-        <motion.div 
-        className="fixed inset-0 -z-10"
-          style={{
-          background: "linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.1) 25%, transparent 50%, rgba(255,255,255,0.05) 75%, transparent 100%)",
-          backgroundSize: "400% 400%"
-        }}
-        animate={{
-          backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"]
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "linear"
-        }}
-      />
-      
-      {/* Floating Abstract Shapes */}
-        <motion.div 
-        className="fixed top-1/4 left-1/4 w-96 h-96 rounded-full -z-10 opacity-15"
-        style={{ background: "radial-gradient(circle, #50E3C2 0%, transparent 70%)" }}
-          animate={{
-          y: [0, -40, 0],
-          x: [0, 30, 0],
-          scale: [1, 1.2, 1],
-          rotate: [0, 180, 360]
-        }}
-        transition={{
-          duration: 25,
-              repeat: Infinity,
-          ease: "easeInOut"
-          }}
-        />
-        
-        <motion.div 
-        className="fixed bottom-1/3 right-1/4 w-80 h-80 rounded-full -z-10 opacity-10"
-        style={{ background: "radial-gradient(circle, #004AAD 0%, transparent 70%)" }}
-          animate={{
-          y: [0, 50, 0],
-          x: [0, -40, 0],
-          scale: [1, 0.8, 1],
-          rotate: [0, -180, -360]
-        }}
-        transition={{
-          duration: 30,
-              repeat: Infinity,
-          ease: "easeInOut"
-          }}
-        />
-        
-        <motion.div 
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full -z-10 opacity-8"
-        style={{ background: "radial-gradient(circle, #50E3C2 0%, transparent 70%)" }}
-        animate={{
-          y: [0, -30, 0],
-          x: [0, 20, 0],
-          scale: [1, 1.1, 1]
-        }}
-        transition={{
-          duration: 28,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      
-      {/* Geometric Shapes */}
-        <motion.div 
-        className="fixed top-1/6 right-1/6 w-32 h-32 -z-10 opacity-10"
-        style={{
-          background: "linear-gradient(45deg, #004AAD, #50E3C2)",
-          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)"
-        }}
-          animate={{
-          rotate: [0, 360],
-          scale: [1, 1.3, 1]
-        }}
-        transition={{
-          duration: 35,
-              repeat: Infinity,
-              ease: "linear"
-          }}
-        />
-        
-        <motion.div 
-        className="fixed bottom-1/6 left-1/6 w-24 h-24 -z-10 opacity-8"
-        style={{
-          background: "linear-gradient(45deg, #50E3C2, #004AAD)",
-          clipPath: "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)"
-        }}
-          animate={{
-          rotate: [0, -360],
-          scale: [1, 0.7, 1]
-        }}
-        transition={{
-          duration: 40,
-              repeat: Infinity,
-          ease: "linear"
-          }}
-        />
-
-      {/* Content with relative positioning */}
-      <div className="relative z-10 pt-20">
-        {/* Fixed Navbar with backdrop blur */}
-        <Navbar />
-
-        {/* Main content with background container */}
-        <div className="relative">
-          {/* Hero Section - Single Frame */}
-          <section id="hero" className="h-screen flex items-center justify-center bg-transparent relative overflow-hidden">
-            <div className="container mx-auto px-6 h-full flex items-center">
-              <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
-                {/* Left: Text */}
-              <motion.div
-                  initial={{ opacity: 0, x: -60 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 1.2, ease: "easeOut" }}
-                  className="space-y-6 text-left max-w-xl"
-              >
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="inline-flex items-center px-4 py-2 bg-white/15 rounded-full border border-white/25 backdrop-blur-md"
-                  >
-                    <Zap className="h-4 w-4 text-white mr-2" />
-                    <span className="text-xs font-semibold text-white font-inter tracking-wide">AI-Powered SOP Generation</span>
-                </motion.div>
-                
-                <motion.h1 
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, delay: 0.4 }}
-                    className="text-4xl sm:text-5xl lg:text-6xl font-extrabold font-montserrat text-white leading-tight"
-                  >
-                    Automate Your<br />
-                    <span className="text-white">Processes with</span><br />
-                    <span className="text-white font-bold">Intelligent SOPs</span>
-                </motion.h1>
-                
-                <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.6 }}
-                    className="text-lg lg:text-xl text-[#EEEEEE] font-inter font-medium"
-                  >
-                    Transform complex workflows into crystal-clear Standard Operating Procedures in seconds.
-                </motion.p>
-                
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.8 }}
-                    className="flex flex-col sm:flex-row gap-4 pt-2"
-                  >
-                <motion.div 
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                >
-                    <Button 
-                      size="lg"
-                      onClick={handleGetStarted}
-                        className="bg-white text-brand-blue font-bold rounded-full px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 text-base"
-                    >
-                      Start Your Free Trial
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </motion.div>
-                  </motion.div>
-                </motion.div>
-
-                {/* Right: Premium Spline 3D Scene */}
-                <motion.div 
-                  initial={{ opacity: 0, x: 60 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
-                  className="flex justify-center items-center w-full"
-                >
-                  <motion.div 
-                    className="relative w-full max-w-lg"
-                    animate={{ 
-                      y: [0, -15, 0],
-                      rotate: [0, 1, 0, -1, 0]
-                    }}
-                    transition={{ 
-                      duration: 8, 
-                      repeat: Infinity, 
-                      ease: "easeInOut",
-                      y: { duration: 6, ease: "easeInOut" },
-                      rotate: { duration: 8, ease: "easeInOut" }
-                    }}
-                  >
-                    <img
-                      src={heroGraphic}
-                      alt="AI Automation Hero"
-                      className="w-full h-auto"
-                    />
-                  </motion.div>
-                </motion.div>
-              </div>
-            </div>
-            
-            {/* Scroll Indicator */}
-            <motion.div 
-              className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <button 
-                onClick={() => scrollToSection('features')} 
-                className="text-white/70 hover:text-white transition-colors duration-300"
-              >
-                <ChevronDown className="h-8 w-8" />
-              </button>
-            </motion.div>
-          </section>
-
-          {/* Features Section - Creative Layout */}
-          <section id="features" className="py-16 mt-8 relative">
-            {/* Background Shape */}
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/5 to-brand-green/5" />
-            <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full bg-gradient-to-br from-brand-green/10 to-transparent blur-3xl" />
-            <div className="absolute bottom-1/4 left-1/4 w-80 h-80 rounded-full bg-gradient-to-br from-brand-blue/10 to-transparent blur-3xl" />
-            
-            <div className="container mx-auto px-6 relative z-10">
-              <AnimatedSection className="text-center mb-24">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="text-5xl lg:text-6xl font-extrabold text-white mb-8 font-montserrat text-center"
-                >
-                  Powerful Features
-                </motion.h2>
-                <motion.p 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                  className="text-xl lg:text-2xl text-[#EEEEEE] max-w-4xl mx-auto font-inter font-medium"
-                >
-                  Everything you need to create, manage, and optimize your Standard Operating Procedures with AI precision
-                </motion.p>
-              </AnimatedSection>
-              
-              <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
-                {/* Left: First two features */}
-                <motion.div 
-                  className="space-y-8"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
-                  {features.slice(0, 2).map((feature, index) => (
-                    <motion.div 
-                      key={index} 
-                      variants={fadeInUp}
-                      whileHover={{ x: 10, scale: 1.02 }}
-                      transition={{ duration: 0.3 }}
-                      className="group"
-                    >
-                      <Card className="border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 overflow-hidden">
-                        <CardContent className="p-8">
-                          <div className="flex items-start space-x-6">
-                      <motion.div 
-                              className="flex-shrink-0 p-4 bg-white/20 backdrop-blur-sm rounded-2xl group-hover:bg-white/30 transition-all duration-300 border border-white/20 shadow-lg"
-                              animate={floatingAnimation}
-                      >
-                              {React.cloneElement(feature.icon, { className: "h-8 w-8 text-white" })}
-                      </motion.div>
-                            <div>
-                              <CardTitle className="text-2xl font-bold text-white font-montserrat group-hover:text-white transition-colors duration-300 mb-3">
-                                {feature.title}
-                              </CardTitle>
-                              <CardDescription className="text-[#DDDDDD] font-inter leading-relaxed text-lg">
-                                {feature.description}
-                              </CardDescription>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </motion.div>
-                
-                {/* Right: Premium Spline 3D Workflow Scene */}
-                <motion.div
-                  initial={{ opacity: 0, x: 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] as const }}
-                  viewport={{ once: true }}
-                  className="flex justify-center"
-                >
-                  <motion.div 
-                    className="w-full"
-                    animate={{ 
-                      y: [0, -12, 0],
-                      rotate: [0, -0.5, 0, 0.5, 0]
-                    }}
-                    transition={{ 
-                      duration: 7, 
-                      repeat: Infinity, 
-                      ease: "easeInOut",
-                      y: { duration: 5, ease: "easeInOut" },
-                      rotate: { duration: 7, ease: "easeInOut" }
-                    }}
-                  >
-                    <img
-                      src={featuresGraphic}
-                      alt="Workflow Features"
-                      className="w-full h-auto"
-                    />
-                  </motion.div>
-              </motion.div>
-              </div>
-              
-              {/* Bottom: Last two features */}
-              <motion.div 
-                className="grid lg:grid-cols-2 gap-8"
-                variants={staggerContainer}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-              >
-                {features.slice(2, 4).map((feature, index) => (
-                <motion.div 
-                    key={index}
-                    variants={fadeInUp}
-                    whileHover={{ y: -10, scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                    className="group"
-                  >
-                    <Card className="border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 overflow-hidden">
-                      <CardContent className="p-8">
-                        <div className="flex items-start space-x-6">
-                  <motion.div 
-                            className="flex-shrink-0 p-4 bg-white/20 backdrop-blur-sm rounded-2xl group-hover:bg-white/30 transition-all duration-300 border border-white/20 shadow-lg"
-                            animate={floatingAnimation}
-                          >
-                            {React.cloneElement(feature.icon, { className: "h-8 w-8 text-white" })}
-                  </motion.div>
-                          <div>
-                            <CardTitle className="text-2xl font-bold text-white font-montserrat group-hover:text-white transition-colors duration-300 mb-3">
-                              {feature.title}
-                            </CardTitle>
-                            <CardDescription className="text-[#DDDDDD] font-inter leading-relaxed text-lg">
-                              {feature.description}
-                            </CardDescription>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </div>
-          </section>
-
-          {/* Trusted By Section */}
-          <section className="py-16 relative">
-            <div className="container mx-auto px-6 relative z-10">
-              <AnimatedSection className="text-center mb-12">
-                <p className="text-lg text-[#DDDDDD] font-inter font-medium mb-8">
-                  Trusted by innovative companies worldwide
-                </p>
-                  <motion.div 
-                  className="flex flex-wrap justify-center items-center gap-12 opacity-60"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
-                  {['Microsoft', 'Google', 'Amazon', 'Netflix', 'Spotify', 'Slack'].map((company, index) => (
-                    <motion.div
-                      key={index}
-                      variants={fadeInUp}
-                      className="text-white/60 font-bold text-xl font-montserrat"
-                      whileHover={{ scale: 1.1, opacity: 0.8 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {company}
-                  </motion.div>
-                  ))}
-                </motion.div>
-              </AnimatedSection>
-            </div>
-          </section>
-
-          {/* How It Works Section */}
-          <section id="how-it-works" className="py-16 mt-8 relative">
-            <div className="container mx-auto px-6 relative z-10">
-              <AnimatedSection className="text-center mb-20">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="text-5xl lg:text-6xl font-extrabold text-white mb-8 font-montserrat text-center"
-                >
-                  How It Works
-                </motion.h2>
-                <p className="text-xl lg:text-2xl text-[#EEEEEE] max-w-4xl mx-auto font-inter font-medium">
-                  Transform your processes into professional SOPs in three simple steps
-                </p>
-              </AnimatedSection>
-              
-              <div className="grid lg:grid-cols-2 gap-20 items-center">
-                {/* Steps */}
-            <motion.div 
-                  className="space-y-12"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
-                  {howItWorksSteps.map((step, index) => (
-                    <motion.div
-                      key={index}
-                      variants={fadeInUp}
-                      className="flex items-start space-x-8 group"
-                    >
-                      <motion.div 
-                        className="flex-shrink-0 w-20 h-20 bg-white/20 backdrop-blur-xl rounded-3xl flex items-center justify-center border border-white/20 shadow-2xl group-hover:shadow-3xl transition-all duration-300"
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                      >
-                        <div className="text-3xl font-extrabold text-white font-montserrat">
-                          {step.step}
-                        </div>
-            </motion.div>
-                      <div className="flex-1">
-                        <div className="flex items-center mb-4">
-                          <div className="p-3 bg-white/20 rounded-2xl mr-4 border border-white/20">
-                            {React.cloneElement(step.icon, { className: "h-8 w-8 text-white" })}
-                          </div>
-                          <h3 className="text-2xl font-bold text-white font-montserrat group-hover:text-white transition-colors duration-300">
-                            {step.title}
-                          </h3>
-                        </div>
-                        <p className="text-[#DDDDDD] font-inter leading-relaxed text-lg">
-                          {step.description}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </motion.div>
-                
-                {/* Premium WebM Video - How It Works Process */}
-                <motion.div
-                  className="relative"
-                  initial={{ opacity: 0, x: 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] as const }}
-                  viewport={{ once: true }}
-                >
-                  <motion.div 
-                    className="w-full"
-                    animate={{ 
-                      y: [0, -10, 0],
-                      rotate: [0, 0.8, 0, -0.8, 0]
-                    }}
-                    transition={{ 
-                      duration: 6, 
-                      repeat: Infinity, 
-                      ease: "easeInOut",
-                      y: { duration: 4, ease: "easeInOut" },
-                      rotate: { duration: 6, ease: "easeInOut" }
-                    }}
-                  >
-                    <img
-                      src={howItWorksGraphic}
-                      alt="How It Works Process"
-                      className="w-full h-auto"
-                    />
-                  </motion.div>
-                </motion.div>
-              </div>
-          </div>
-        </section>
-
-          {/* Pricing Section */}
-          <section id="pricing" className="py-16 mt-8 relative">
-          <div className="container mx-auto px-6 relative z-10">
-              <AnimatedSection className="text-center mb-20">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="text-5xl lg:text-6xl font-extrabold text-white mb-8 font-montserrat text-center"
-                >
-                  Choose Your Plan
-              </motion.h2>
-                <p className="text-xl lg:text-2xl text-[#EEEEEE] max-w-4xl mx-auto font-inter font-medium">
-                  Start free and scale as you grow. No hidden fees, cancel anytime.
-              </p>
-            </AnimatedSection>
-            
-            <motion.div 
-                className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              {pricingPlans.map((plan, index) => (
-                <motion.div
-                  key={index}
-                  variants={fadeInUp}
-                    whileHover={{ y: -10, scale: plan.popular ? 1.05 : 1.02 }}
-                  transition={{ duration: 0.3 }}
-                >
-                    <Card className={`relative shadow-2xl transition-all duration-500 rounded-3xl border-0 group ${
-                    plan.popular 
-                        ? 'bg-white/20 backdrop-blur-xl ring-2 ring-white/30 shadow-white/25 scale-105' 
-                        : 'bg-white/10 backdrop-blur-xl hover:shadow-3xl border border-white/20'
-                  }`}>
-                    {plan.popular && (
-                      <motion.div 
-                          className="flex justify-center mb-4"
-                        animate={{ scale: [1, 1.05, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                          <span className="bg-white text-brand-blue px-8 py-3 rounded-full text-sm font-bold font-montserrat shadow-2xl border border-brand-blue/10">
-                          Most Popular
-                        </span>
-                      </motion.div>
-                    )}
-                      <CardHeader className="text-center pb-8 pt-12">
-                        <CardTitle className="text-3xl font-bold text-white font-montserrat mb-6 group-hover:text-white transition-colors duration-300">
-                        {plan.name}
-                      </CardTitle>
-                      <motion.div 
-                          className="mb-8"
-                        whileHover={{ scale: 1.05 }}
-                      >
-                          <span className="text-6xl font-extrabold text-white">{plan.price}</span>
-                          <span className="text-[#DDDDDD] font-inter text-xl">{plan.period}</span>
-                      </motion.div>
-                    </CardHeader>
-                      <CardContent className="px-8 pb-8">
-                        <ul className="space-y-6 mb-10">
-                        {plan.features.map((feature, featureIndex) => (
-                          <motion.li 
-                            key={featureIndex} 
-                              className="flex items-start text-[#DDDDDD] font-inter text-lg"
-                              whileHover={{ x: 8 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                              <CheckCircle className="h-6 w-6 text-white mr-4 flex-shrink-0 mt-0.5" />
-                            {feature}
-                          </motion.li>
-                        ))}
-                      </ul>
-                        <motion.div 
-                          whileHover={{ scale: 1.02 }} 
-                          whileTap={{ scale: 0.98 }}
-                          className="group"
-                        >
-                        <Button 
-                            className={`w-full rounded-2xl py-4 font-bold text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 ${
-                            plan.popular 
-                                ? 'bg-white text-brand-blue hover:bg-white/90' 
-                                : 'bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 backdrop-blur-md'
-                          }`}
-                          onClick={handleGetStarted}
-                        >
-                          {plan.cta}
-                        </Button>
-                      </motion.div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
-          {/* FAQ Section */}
-          <section id="faq" className="py-16 mt-8 relative">
-            <div className="container mx-auto px-6 relative z-10">
-              <AnimatedSection className="text-center mb-20">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="text-5xl lg:text-6xl font-extrabold text-white mb-8 font-montserrat text-center"
-                >
-                  Frequently Asked Questions
-                </motion.h2>
-                <p className="text-xl lg:text-2xl text-[#EEEEEE] max-w-4xl mx-auto font-inter font-medium">
-                  Everything you need to know about Flowforge and AI-powered SOP generation
-                </p>
-            </AnimatedSection>
-            
-              <div className="max-w-5xl mx-auto">
-            <motion.div 
-                  className="space-y-6"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-                  {faqData.map((faq, index) => (
-                <motion.div
-                  key={index}
-                  variants={fadeInUp}
-                      className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300"
-                    >
-                      <motion.button
-                        className="w-full px-10 py-8 text-left flex items-center justify-between hover:bg-white/10 transition-colors duration-300"
-                        onClick={() => toggleFAQ(index)}
-                        whileHover={{ x: 8 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <h3 className="text-xl font-bold text-white font-montserrat pr-6">
-                          {faq.question}
-                        </h3>
-                      <motion.div 
-                          animate={{ rotate: openFAQ === index ? 45 : 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="flex-shrink-0"
-                        >
-                          {openFAQ === index ? (
-                            <Minus className="h-8 w-8 text-white" />
-                          ) : (
-                            <Plus className="h-8 w-8 text-white" />
-                          )}
-                        </motion.div>
-                      </motion.button>
-                      
-                        <motion.div 
-                        initial={false}
-                        animate={{
-                          height: openFAQ === index ? "auto" : 0,
-                          opacity: openFAQ === index ? 1 : 0
-                        }}
-                        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] as const }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-10 pb-8">
-                          <p className="text-[#DDDDDD] font-inter leading-relaxed text-lg">
-                            {faq.answer}
-                          </p>
-                        </div>
-                        </motion.div>
-                </motion.div>
-              ))}
-            </motion.div>
-              </div>
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-          <section id="testimonials" className="py-16 mt-8 relative">
-          <div className="container mx-auto px-6 relative z-10">
-              <AnimatedSection className="text-center mb-20">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="text-5xl lg:text-6xl font-extrabold text-white mb-8 font-montserrat text-center"
-                >
-                What Our Users Say
-              </motion.h2>
-                <p className="text-xl lg:text-2xl text-[#EEEEEE] max-w-4xl mx-auto font-inter font-medium">
-                Join thousands of teams who've transformed their operations with Flowforge
-              </p>
-            </AnimatedSection>
-            
-            <motion.div 
-                className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              {testimonials.map((testimonial, index) => (
-                <motion.div
-                  key={index}
-                  variants={fadeInUp}
-                    whileHover={{ y: -10, scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                >
-                    <Card className="border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 rounded-3xl group h-full bg-white/10 backdrop-blur-xl border border-white/20 overflow-hidden">
-                      <CardContent className="pt-10 px-8">
-                      <motion.div 
-                          className="flex mb-8"
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                      >
-                        {[...Array(5)].map((_, starIndex) => (
-                          <motion.div
-                            key={starIndex}
-                            initial={{ scale: 0 }}
-                            whileInView={{ scale: 1 }}
-                            transition={{ duration: 0.3, delay: starIndex * 0.1 }}
-                          >
-                              <Star className="h-6 w-6 text-white fill-current" />
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                        <p className="text-[#DDDDDD] mb-10 italic font-inter leading-relaxed text-lg group-hover:text-white transition-colors duration-300">
-                        "{testimonial.content}"
-                      </p>
-                      <div className="flex items-center">
-                        <motion.img 
-                          src={testimonial.image} 
-                          alt={testimonial.name}
-                            className="w-16 h-16 rounded-full mr-5 object-cover shadow-lg"
-                          whileHover={{ scale: 1.1 }}
-                          transition={{ duration: 0.3 }}
-                        />
-                        <div>
-                            <p className="font-bold text-white font-montserrat text-lg group-hover:text-white transition-colors duration-300">
-                            {testimonial.name}
-                          </p>
-                            <p className="text-[#DDDDDD] font-inter">
-                            {testimonial.role}, {testimonial.company}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section id="contact" className="py-12 mt-8 relative">
-          <div className="container mx-auto px-6 relative z-10">
-            <AnimatedSection className="text-center mb-16">
-                <motion.h2 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="text-4xl lg:text-5xl font-bold text-white mb-6 font-montserrat text-center"
-                >
-                Contact Us
-              </motion.h2>
-                <p className="text-xl text-[#EEEEEE] max-w-3xl mx-auto font-inter">
-                Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
-              </p>
-            </AnimatedSection>
-            
-            <div className="max-w-2xl mx-auto">
-              <AnimatedSection>
-                <motion.div whileHover={{ scale: 1.02 }}>
-                    <Card className="border-0 shadow-xl rounded-2xl hover:shadow-2xl transition-all duration-500 bg-white/10 backdrop-blur-md border border-white/20">
-                    <CardContent className="p-8">
-                      <form onSubmit={handleContactSubmit} className="space-y-6">
-                        <motion.div
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.5, delay: 0.1 }}
-                        >
-                            <Label htmlFor="contact-name" className="text-white font-inter font-medium">Name</Label>
-                          <Input
-                            id="contact-name"
-                            value={contactForm.name}
-                            onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
-                              className="border-white/20 bg-white/10 text-white rounded-xl mt-2 py-3 font-inter transition-all duration-300 focus:scale-105 focus:border-white placeholder:text-[#DDDDDD]"
-                              placeholder="Your name"
-                            required
-                          />
-                        </motion.div>
-                        <motion.div
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.5, delay: 0.2 }}
-                        >
-                            <Label htmlFor="contact-email" className="text-white font-inter font-medium">Email</Label>
-                          <Input
-                            id="contact-email"
-                            type="email"
-                            value={contactForm.email}
-                            onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
-                              className="border-white/20 bg-white/10 text-white rounded-xl mt-2 py-3 font-inter transition-all duration-300 focus:scale-105 focus:border-white placeholder:text-[#DDDDDD]"
-                              placeholder="your@email.com"
-                            required
-                          />
-                        </motion.div>
-                        <motion.div
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.5, delay: 0.3 }}
-                        >
-                            <Label htmlFor="contact-message" className="text-white font-inter font-medium">Message</Label>
-                          <Textarea
-                            id="contact-message"
-                            value={contactForm.message}
-                            onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
-                              className="border-white/20 bg-white/10 text-white rounded-xl min-h-[150px] mt-2 py-3 font-inter transition-all duration-300 focus:scale-105 focus:border-white placeholder:text-[#DDDDDD]"
-                              placeholder="Your message..."
-                            required
-                          />
-                        </motion.div>
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5, delay: 0.4 }}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <Button 
-                            type="submit" 
-                              className="w-full bg-white text-brand-blue rounded-xl py-4 font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-                          >
-                            Send Message
-                          </Button>
-                        </motion.div>
-                      </form>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </AnimatedSection>
-              
-              {/* Social Media Links */}
-              <AnimatedSection className="text-center mt-12">
-                  <p className="text-[#DDDDDD] mb-8 font-inter text-lg">
-                  Connect with us on social media
-                </p>
-                <div className="flex justify-center space-x-8">
-                  {[
-                    { icon: Linkedin, href: "https://linkedin.com/company/flowforge", label: "LinkedIn" },
-                    { icon: Twitter, href: "https://twitter.com/flowforge", label: "Twitter" },
-                    { icon: Facebook, href: "https://facebook.com/flowforge", label: "Facebook" }
-                  ].map((social, index) => (
-                    <a
-                      key={index}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-white hover:text-[#DDDDDD] transition-all duration-300"
-                      aria-label={`Follow us on ${social.label}`}
-                    >
-                      <social.icon className="h-8 w-8" />
-                    </a>
-                  ))}
-                </div>
-              </AnimatedSection>
-            </div>
-          </div>
-        </section>
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute top-20 left-10 w-72 h-72 bg-brand-green/20 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{ duration: 8, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute bottom-20 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
         </div>
 
-        {/* Footer */}
-        <footer className="bg-white/10 backdrop-blur-md text-white py-16 relative border-t border-white/20">
-          <div className="container mx-auto px-6">
-            <motion.div 
-              className="grid md:grid-cols-4 gap-8"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-center lg:text-left"
             >
-              <motion.div variants={fadeInUp} className="md:col-span-2">
-                <div className="flex items-center mb-6 group cursor-pointer">
-                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mr-3">
-                    <Bot className="h-6 w-6 text-brand-blue" />
-                  </div>
-                  <span className="text-2xl font-bold font-montserrat group-hover:text-[#DDDDDD] transition-colors duration-300">
-                    Flowforge
-                  </span>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <Badge className="bg-white/20 text-white border-white/30 mb-6 px-4 py-2 text-sm font-medium">
+                  🚀 AI-Powered SOP Generation
+                </Badge>
+              </motion.div>
+              
+              <motion.h1 
+                className="text-4xl sm:text-5xl lg:text-6xl font-extrabold font-montserrat text-white mb-6 leading-tight"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              >
+                Streamline Your Processes with{" "}
+                <span className="bg-gradient-to-r from-brand-green to-white bg-clip-text text-transparent">
+                  Intelligent SOP Creation
+                </span>
+              </motion.h1>
+              
+              <motion.p 
+                className="text-xl text-white/90 font-inter mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+              >
+                Transform your business workflows into clear, actionable Standard Operating Procedures in minutes with AI. 
+                No more manual documentation - just describe your process and watch it become a professional SOP.
+              </motion.p>
+              
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 1 }}
+              >
+                <Button 
+                  onClick={handleGetStarted}
+                  className="bg-white text-brand-blue hover:bg-gray-100 rounded-xl px-8 py-4 font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group"
+                >
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => scrollToSection('demo')}
+                  className="border-white/30 text-white hover:bg-white/10 rounded-xl px-8 py-4 font-medium text-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 group"
+                >
+                  <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+                  Watch Demo
+                </Button>
+              </motion.div>
+
+              <motion.div
+                className="mt-8 flex items-center justify-center lg:justify-start space-x-6 text-white/80"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+              >
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-5 w-5 text-brand-green" />
+                  <span className="font-inter">No credit card required</span>
                 </div>
-                <p className="text-[#DDDDDD] font-inter leading-relaxed max-w-md">
-                  Streamline your processes with intelligent SOP creation powered by AI. Transform your business workflows into clear, actionable procedures.
-                </p>
-              </motion.div>
-              
-              <motion.div variants={fadeInUp}>
-                <h3 className="font-semibold mb-6 font-montserrat text-lg text-white">Product</h3>
-                <ul className="space-y-3 text-[#DDDDDD] font-inter">
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <Link to="/features" className="hover:text-white transition-colors duration-300">Features</Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <Link to="/pricing" className="hover:text-white transition-colors duration-300">Pricing</Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <Link to="/templates" className="hover:text-white transition-colors duration-300">Templates</Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <Link to="/docs/api" className="hover:text-white transition-colors duration-300">API</Link>
-                  </motion.li>
-                </ul>
-              </motion.div>
-              
-              <motion.div variants={fadeInUp}>
-                <h3 className="font-semibold mb-6 font-montserrat text-lg text-white">Support</h3>
-                <ul className="space-y-3 text-[#DDDDDD] font-inter">
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <Link to="/help" className="hover:text-white transition-colors duration-300">Help Center</Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <Link to="/documentation" className="hover:text-white transition-colors duration-300">Documentation</Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <Link to="/contact" className="hover:text-white transition-colors duration-300">Contact</Link>
-                  </motion.li>
-                  <motion.li whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
-                    <Link to="/privacy-policy" className="hover:text-white transition-colors duration-300">Privacy Policy</Link>
-                  </motion.li>
-                </ul>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-5 w-5 text-brand-green" />
+                  <span className="font-inter">14-day free trial</span>
+                </div>
               </motion.div>
             </motion.div>
-            
-            <motion.div 
-              className="border-t border-white/20 mt-12 pt-8 text-center text-[#DDDDDD]"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.8 }}
+
+            {/* Right Content - 3D Animation */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="relative"
             >
-              <p className="font-inter">
-                © {new Date().getFullYear()} Flowforge. All rights reserved.
-              </p>
+              <div className="relative w-full h-96 lg:h-[500px]">
+                <SplineScene
+                  sceneUrl="https://prod.spline.design/ai-automation-hero/scene.splinecode"
+                  className="w-full h-full rounded-2xl"
+                  fallback={
+                    <div className="w-full h-full bg-gradient-to-br from-brand-blue/20 to-brand-green/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20">
+                      <Lottie 
+                        animationData={heroAnimation} 
+                        className="w-full h-full max-w-md max-h-md"
+                        loop={true}
+                      />
+                    </div>
+                  }
+                />
+              </div>
             </motion.div>
           </div>
-        </footer>
-      </div>
+        </div>
+      </motion.section>
 
-      {/* Auth Modal */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)}
+      {/* Features Section */}
+      <section id="features" className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="bg-brand-blue/10 text-brand-blue border-brand-blue/20 mb-6 px-4 py-2 text-sm font-medium">
+              ✨ Powerful Features
+            </Badge>
+            <h2 className="text-4xl sm:text-5xl font-extrabold font-montserrat text-gray-900 mb-6">
+              Everything You Need to{" "}
+              <span className="bg-gradient-to-r from-brand-blue to-brand-green bg-clip-text text-transparent">
+                Streamline Operations
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
+              Powerful AI-driven tools designed to transform how you create, manage, and share your business processes.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+            {/* Features List */}
+            <div className="space-y-8">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group cursor-pointer"
+                  onClick={() => handleFeatureClick(feature)}
+                >
+                  <Card className="border-2 border-transparent hover:border-brand-blue/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <CardContent className="p-6">
+                      <div className="flex items-start space-x-4">
+                        <div className="p-3 bg-brand-blue/10 rounded-xl group-hover:bg-brand-blue/20 transition-colors">
+                          <feature.icon className="h-6 w-6 text-brand-blue" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold font-montserrat text-gray-900 mb-2 group-hover:text-brand-blue transition-colors">
+                            {feature.title}
+                          </h3>
+                          <p className="text-gray-600 font-inter leading-relaxed">
+                            {feature.description}
+                          </p>
+                          <div className="mt-3 flex items-center text-brand-blue font-medium text-sm group-hover:translate-x-2 transition-transform">
+                            Learn more <ArrowRight className="ml-1 h-4 w-4" />
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Features Animation */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="relative w-full h-96 lg:h-[500px]">
+                <SplineScene
+                  sceneUrl="https://prod.spline.design/workflow-features/scene.splinecode"
+                  className="w-full h-full rounded-2xl"
+                  fallback={
+                    <div className="w-full h-full bg-gradient-to-br from-brand-blue/10 to-brand-green/10 rounded-2xl flex items-center justify-center border border-gray-200">
+                      <Lottie 
+                        animationData={featuresAnimation} 
+                        className="w-full h-full max-w-lg max-h-lg"
+                        loop={true}
+                      />
+                    </div>
+                  }
+                />
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="bg-brand-green/10 text-brand-green border-brand-green/20 mb-6 px-4 py-2 text-sm font-medium">
+              🎯 Simple Process
+            </Badge>
+            <h2 className="text-4xl sm:text-5xl font-extrabold font-montserrat text-gray-900 mb-6">
+              How It Works
+            </h2>
+            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
+              Creating professional SOPs has never been easier. Follow these simple steps to transform your processes.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Process Animation */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="relative w-full h-96 lg:h-[400px]">
+                <PremiumVideo
+                  src="/videos/how-it-works-process.webm"
+                  className="w-full h-full rounded-2xl shadow-xl"
+                  autoPlay={true}
+                  loop={true}
+                  muted={true}
+                  fallback={
+                    <div className="w-full h-full bg-gradient-to-br from-brand-blue/10 to-brand-green/10 rounded-2xl flex items-center justify-center border border-gray-200">
+                      <Lottie 
+                        animationData={howItWorksAnimation} 
+                        className="w-full h-full max-w-lg max-h-lg"
+                        loop={true}
+                      />
+                    </div>
+                  }
+                />
+              </div>
+            </motion.div>
+
+            {/* Steps */}
+            <div className="space-y-8">
+              {[
+                {
+                  number: "01",
+                  title: "Describe Your Process",
+                  description: "Simply describe your business process in plain English. No technical jargon needed.",
+                  icon: FileText
+                },
+                {
+                  number: "02", 
+                  title: "AI Generates SOP",
+                  description: "Our advanced AI analyzes your description and creates a comprehensive, professional SOP.",
+                  icon: Zap
+                },
+                {
+                  number: "03",
+                  title: "Review & Customize",
+                  description: "Edit, customize, and perfect your SOP with our intuitive editor and visual workflow tools.",
+                  icon: Settings
+                },
+                {
+                  number: "04",
+                  title: "Share & Implement",
+                  description: "Export in multiple formats and share with your team for immediate implementation.",
+                  icon: Share
+                }
+              ].map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="flex items-start space-x-4 group"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue rounded-xl flex items-center justify-center text-white font-bold text-lg group-hover:bg-brand-blue/90 transition-colors">
+                    {step.number}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold font-montserrat text-gray-900 mb-2 group-hover:text-brand-blue transition-colors">
+                      {step.title}
+                    </h3>
+                    <p className="text-gray-600 font-inter leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Demo Section */}
+      <section id="ai-demo" className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="bg-purple-100 text-purple-700 border-purple-200 mb-6 px-4 py-2 text-sm font-medium">
+              🤖 AI in Action
+            </Badge>
+            <h2 className="text-4xl sm:text-5xl font-extrabold font-montserrat text-gray-900 mb-6">
+              See AI Magic in Action
+            </h2>
+            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
+              Watch how our AI transforms simple descriptions into comprehensive, professional SOPs in real-time.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Demo Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 font-montserrat">
+                  Input Example:
+                </h3>
+                <div className="bg-white rounded-lg p-4 border border-gray-200 font-mono text-sm text-gray-700">
+                  "Create a customer onboarding process that includes account setup, 
+                  product training, and initial support touchpoints to ensure successful adoption."
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="w-8 h-8 border-2 border-brand-blue border-t-transparent rounded-full"
+                />
+                <span className="ml-3 text-gray-600 font-inter">AI Processing...</span>
+              </div>
+
+              <div className="bg-brand-blue/5 rounded-xl p-6 border border-brand-blue/20">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 font-montserrat">
+                  Generated SOP Preview:
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-brand-blue rounded-full flex items-center justify-center text-white text-xs font-bold">1</div>
+                    <span className="font-medium">Initial Customer Contact & Welcome</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-brand-blue rounded-full flex items-center justify-center text-white text-xs font-bold">2</div>
+                    <span className="font-medium">Account Setup & Configuration</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-brand-blue rounded-full flex items-center justify-center text-white text-xs font-bold">3</div>
+                    <span className="font-medium">Product Training & Orientation</span>
+                  </div>
+                  <div className="text-center mt-4">
+                    <span className="text-brand-blue font-medium">+ 9 more detailed steps</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* AI Animation */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="relative w-full h-96 lg:h-[400px]">
+                <PremiumVideo
+                  src="/videos/ai-in-action-demo.webm"
+                  className="w-full h-full rounded-2xl shadow-xl"
+                  autoPlay={true}
+                  loop={true}
+                  muted={true}
+                  fallback={
+                    <div className="w-full h-full bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl flex items-center justify-center border border-gray-200">
+                      <Lottie 
+                        animationData={aiInActionAnimation} 
+                        className="w-full h-full max-w-lg max-h-lg"
+                        loop={true}
+                      />
+                    </div>
+                  }
+                />
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="bg-green-100 text-green-700 border-green-200 mb-6 px-4 py-2 text-sm font-medium">
+              💰 Simple Pricing
+            </Badge>
+            <h2 className="text-4xl sm:text-5xl font-extrabold font-montserrat text-gray-900 mb-6">
+              Choose Your Plan
+            </h2>
+            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
+              Start free and scale as you grow. No hidden fees, no surprises.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {pricingPlans.map((plan, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <Badge className="bg-brand-blue text-white px-4 py-1 text-sm font-medium shadow-lg">
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
+                
+                <Card className={`h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 ${
+                  plan.popular ? 'border-2 border-brand-blue shadow-lg scale-105' : 'border border-gray-200'
+                }`}>
+                  <CardHeader className="text-center pb-8">
+                    <CardTitle className="text-2xl font-bold font-montserrat text-gray-900">
+                      {plan.name}
+                    </CardTitle>
+                    <div className="space-y-2">
+                      <div className="text-4xl font-extrabold text-gray-900">
+                        {plan.price}
+                      </div>
+                      <div className="text-gray-600 font-inter">{plan.period}</div>
+                    </div>
+                    <CardDescription className="text-gray-600 font-inter text-base">
+                      {plan.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <ul className="space-y-3">
+                      {plan.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-center space-x-3">
+                          <CheckCircle className="h-5 w-5 text-brand-green flex-shrink-0" />
+                          <span className="text-gray-700 font-inter">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      onClick={() => handlePlanSelect(plan)}
+                      className={`w-full py-3 font-semibold text-lg rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
+                        plan.popular 
+                          ? 'bg-brand-blue hover:bg-brand-blue/90 text-white shadow-md' 
+                          : 'bg-gray-900 hover:bg-gray-800 text-white'
+                      }`}
+                    >
+                      {plan.buttonText}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <Button
+              variant="outline"
+              onClick={() => setIsPricingDropdownOpen(true)}
+              className="border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white rounded-xl px-6 py-3 font-medium"
+            >
+              Compare All Features
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 mb-6 px-4 py-2 text-sm font-medium">
+              ❓ FAQ
+            </Badge>
+            <h2 className="text-4xl sm:text-5xl font-extrabold font-montserrat text-gray-900 mb-6">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
+              Get answers to common questions about FlowForge and SOP creation.
+            </p>
+          </motion.div>
+
+          <div className="max-w-4xl mx-auto space-y-6">
+            {faqs.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="border border-gray-200 hover:border-brand-blue/30 hover:shadow-md transition-all duration-300">
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 font-montserrat">
+                      {faq.question}
+                    </h3>
+                    <p className="text-gray-600 font-inter leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20 bg-gray-50">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="bg-blue-100 text-blue-700 border-blue-200 mb-6 px-4 py-2 text-sm font-medium">
+              ⭐ Customer Stories
+            </Badge>
+            <h2 className="text-4xl sm:text-5xl font-extrabold font-montserrat text-gray-900 mb-6">
+              Loved by Teams Worldwide
+            </h2>
+            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
+              See how organizations are transforming their operations with FlowForge.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-1 mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    <p className="text-gray-700 font-inter leading-relaxed mb-6 italic">
+                      "{testimonial.content}"
+                    </p>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-brand-blue/10 rounded-full flex items-center justify-center">
+                        <span className="text-brand-blue font-bold">{testimonial.avatar}</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900 font-montserrat">{testimonial.name}</p>
+                        <p className="text-sm text-gray-600 font-inter">{testimonial.role}</p>
+                        <p className="text-sm text-gray-500 font-inter">{testimonial.company}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-brand-blue to-brand-green">
+        <div className="container mx-auto px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl sm:text-5xl font-extrabold font-montserrat text-white mb-6">
+              Ready to Transform Your Processes?
+            </h2>
+            <p className="text-xl text-white/90 font-inter mb-8 max-w-3xl mx-auto leading-relaxed">
+              Join thousands of organizations already using FlowForge to streamline their operations. 
+              Start your free trial today and see the difference AI can make.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                onClick={handleGetStarted}
+                className="bg-white text-brand-blue hover:bg-gray-100 rounded-xl px-8 py-4 font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group"
+              >
+                Start Free Trial
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => scrollToSection('contact')}
+                className="border-white/30 text-white hover:bg-white/10 rounded-xl px-8 py-4 font-medium text-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-1"
+              >
+                Contact Sales
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl sm:text-5xl font-extrabold font-montserrat text-gray-900 mb-6">
+              Get in Touch
+            </h2>
+            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
+              Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            {/* Contact Form */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <Card className="border border-gray-200 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-bold font-montserrat text-gray-900">
+                    Send us a message
+                  </CardTitle>
+                  <CardDescription className="text-gray-600 font-inter">
+                    We'll get back to you within 24 hours.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <form onSubmit={handleNewsletterSignup} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Input placeholder="First Name" className="rounded-lg" />
+                      <Input placeholder="Last Name" className="rounded-lg" />
+                    </div>
+                    <Input placeholder="Email Address" type="email" className="rounded-lg" />
+                    <Input placeholder="Company" className="rounded-lg" />
+                    <textarea 
+                      placeholder="Your message..."
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue resize-none"
+                    />
+                    <Button 
+                      type="submit"
+                      className="w-full bg-brand-blue hover:bg-brand-blue/90 text-white rounded-xl py-3 font-semibold text-lg shadow-md hover:shadow-lg transition-all duration-300"
+                    >
+                      Send Message
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Contact Info */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="space-y-8"
+            >
+              <div>
+                <h3 className="text-2xl font-bold font-montserrat text-gray-900 mb-6">
+                  Contact Information
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-brand-blue/10 rounded-lg flex items-center justify-center">
+                      <Mail className="h-6 w-6 text-brand-blue" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Email</p>
+                      <p className="text-gray-600">hello@flowforge.com</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-brand-blue/10 rounded-lg flex items-center justify-center">
+                      <Phone className="h-6 w-6 text-brand-blue" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Phone</p>
+                      <p className="text-gray-600">+1 (555) 123-4567</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-brand-blue/10 rounded-lg flex items-center justify-center">
+                      <MapPin className="h-6 w-6 text-brand-blue" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Address</p>
+                      <p className="text-gray-600">123 Innovation Drive<br />San Francisco, CA 94107</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 font-montserrat">
+                  Follow Us
+                </h4>
+                <div className="flex space-x-4">
+                  <Button variant="outline" size="sm" className="rounded-lg">
+                    <Twitter className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" className="rounded-lg">
+                    <Linkedin className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" className="rounded-lg">
+                    <Github className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-16">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="md:col-span-2">
+              <div className="flex items-center mb-6 group cursor-pointer" onClick={() => window.location.href = '/'}>
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mr-3">
+                  <Bot className="h-6 w-6 text-brand-blue" />
+                </div>
+                <span className="text-2xl font-bold font-montserrat group-hover:text-gray-300 transition-colors">
+                  Flowforge
+                </span>
+              </div>
+              <p className="text-gray-400 font-inter leading-relaxed max-w-md mb-6">
+                Streamline your processes with intelligent SOP creation powered by AI. Transform your business workflows into clear, actionable procedures.
+              </p>
+              <form onSubmit={handleNewsletterSignup} className="flex gap-2 max-w-md">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 rounded-lg"
+                />
+                <Button type="submit" className="bg-brand-blue hover:bg-brand-blue/90 rounded-lg">
+                  Subscribe
+                </Button>
+              </form>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-6 font-montserrat text-lg">Product</h3>
+              <ul className="space-y-3 text-gray-400 font-inter">
+                <li><a href="/features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="/pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="/templates" className="hover:text-white transition-colors">Templates</a></li>
+                <li><a href="/docs/api" className="hover:text-white transition-colors">API</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-6 font-montserrat text-lg">Support</h3>
+              <ul className="space-y-3 text-gray-400 font-inter">
+                <li><a href="/help" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="/documentation" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              </ul>
+            </div>
+          </div>
+          <Separator className="my-8 bg-gray-800" />
+          <div className="text-center text-gray-400 font-inter">
+            <p>© {new Date().getFullYear()} Flowforge. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Modals */}
+      {isAuthModalOpen && (
+        <AuthModal 
+          open={isAuthModalOpen} 
+          onOpenChange={setIsAuthModalOpen} 
+          defaultTab={authTab} 
+        />
+      )}
+
+      <FeatureModal
+        isOpen={isFeatureModalOpen}
+        onClose={() => setIsFeatureModalOpen(false)}
+        feature={selectedFeature}
+      />
+
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        selectedPlan={selectedPlan}
+      />
+
+      <PricingDropdown
+        isOpen={isPricingDropdownOpen}
+        onClose={() => setIsPricingDropdownOpen(false)}
       />
     </div>
   );
