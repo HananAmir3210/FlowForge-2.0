@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 const PrivacyPolicy = () => {
   return (
     <Layout title="Privacy Policy">
-      <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg max-w-4xl mx-auto">
+      <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-white font-montserrat text-center">Privacy Policy</CardTitle>
           <p className="text-center text-[#EEEEEE] font-inter">
@@ -133,7 +133,7 @@ const PrivacyPolicy = () => {
                 If you have questions about this Privacy Policy or our data practices, please contact us:
               </p>
               <div className="mt-6">
-                <div className="bg-white/10 backdrop-blur-md border border-sopfuel-gray rounded-xl p-6 text-white shadow-lg max-w-md mx-auto">
+                <div className="bg-white/10 backdrop-blur-md border border-flowforge-gray rounded-xl p-6 text-white shadow-lg max-w-md mx-auto">
                   <h4 className="text-lg font-bold font-montserrat mb-2 text-white">Contact Information</h4>
                   <p className="text-[#EEEEEE] font-inter mb-1">
                     <strong>Email:</strong> privacy@flowforge.com

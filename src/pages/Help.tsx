@@ -110,7 +110,7 @@ const Help = () => {
           <h2 className="text-3xl font-bold text-white mb-8 text-center font-montserrat">Browse by Category</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories.map((category, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
+              <Card key={index} className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer">
                 <CardHeader className="text-center">
                   <div className="flex justify-center mb-4">
                     <div className={`p-3 rounded-lg bg-${category.color}-100 dark:bg-${category.color}-900`}>
@@ -131,7 +131,7 @@ const Help = () => {
         </div>
 
         {/* Popular Articles */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardHeader>
             <CardTitle className="text-white font-montserrat text-2xl">Popular Articles</CardTitle>
             <CardDescription className="text-[#EEEEEE] font-inter">
@@ -160,7 +160,7 @@ const Help = () => {
           <h2 className="text-3xl font-bold text-white mb-8 text-center font-montserrat">Frequently Asked Questions</h2>
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <Card key={index} className="overflow-hidden bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+              <Card key={index} className="overflow-hidden bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
                 <CardContent className="p-0">
                   <button
                     onClick={() => toggleFAQ(index)}
@@ -189,7 +189,7 @@ const Help = () => {
         </div>
 
         {/* Contact Support */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardContent className="pt-6 text-center">
             <HelpCircle className="h-12 w-12 text-brand-blue mx-auto mb-4 drop-shadow-lg" />
             <h3 className="text-2xl font-bold text-white mb-4 font-montserrat">
@@ -207,7 +207,7 @@ const Help = () => {
 
         {/* Quick Links */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="text-center hover:shadow-2xl transition-shadow bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg group">
+          <Card className="text-center hover:shadow-2xl transition-shadow bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg group">
             <CardContent className="pt-8 pb-6 flex flex-col items-center">
               <Video className="h-10 w-10 text-white drop-shadow-lg mb-3 group-hover:scale-110 transition-transform" />
               <h4 className="font-semibold text-white mb-2 font-montserrat text-lg">Video Tutorials</h4>
@@ -218,7 +218,7 @@ const Help = () => {
             </CardContent>
           </Card>
 
-          <Card className="text-center hover:shadow-2xl transition-shadow bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg group">
+          <Card className="text-center hover:shadow-2xl transition-shadow bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg group">
             <CardContent className="pt-8 pb-6 flex flex-col items-center">
               <MessageCircle className="h-10 w-10 text-white drop-shadow-lg mb-3 group-hover:scale-110 transition-transform" />
               <h4 className="font-semibold text-white mb-2 font-montserrat text-lg">Community Forum</h4>
@@ -229,7 +229,7 @@ const Help = () => {
             </CardContent>
           </Card>
 
-          <Card className="text-center hover:shadow-2xl transition-shadow bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg group">
+          <Card className="text-center hover:shadow-2xl transition-shadow bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg group">
             <CardContent className="pt-8 pb-6 flex flex-col items-center">
               <FileText className="h-10 w-10 text-white drop-shadow-lg mb-3 group-hover:scale-110 transition-transform" />
               <h4 className="font-semibold text-white mb-2 font-montserrat text-lg">API Documentation</h4>

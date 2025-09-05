@@ -82,7 +82,7 @@ const Community = () => {
         {/* Community Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {communityStats.map((stat, index) => (
-            <Card key={index} className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+            <Card key={index} className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
               <CardContent className="pt-6">
                 <stat.icon className="h-8 w-8 text-blue-600 mx-auto mb-3" />
                 <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
@@ -128,11 +128,11 @@ const Community = () => {
         </div>
 
         {/* Community Events */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardHeader>
             <CardTitle className="text-white font-montserrat text-2xl flex items-center space-x-2">
               <Calendar className="h-6 w-6" />
-              <span>Community Events</span>
+              <span>Upcoming Events</span>
             </CardTitle>
             <CardDescription className="text-[#EEEEEE] font-inter">
               Regular events to help you learn, network, and grow your skills
@@ -161,7 +161,7 @@ const Community = () => {
 
         {/* Community Guidelines */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+          <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
             <CardHeader>
               <CardTitle className="text-white font-montserrat text-2xl">Community Guidelines</CardTitle>
               <CardDescription className="text-[#EEEEEE] font-inter">

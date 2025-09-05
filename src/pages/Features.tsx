@@ -42,14 +42,14 @@ const Features = () => {
     <Layout title="Features">
       <div className="space-y-8">
         <div className="text-center mb-12">
-          <p className="text-lg text-sopfuel-dark/70 max-w-3xl mx-auto font-open-sans">
-            Discover the powerful features that make Sopfuel the best choice for creating and managing your Standard Operating Procedures.
+          <p className="text-lg text-flowforge-dark/70 max-w-3xl mx-auto font-open-sans">
+            Discover the powerful features that make FlowForge the best choice for creating and managing your Standard Operating Procedures.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
-            <Card key={index} className="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-sopfuel-gray bg-white/10 backdrop-blur-md">
+            <Card key={index} className="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-flowforge-gray bg-white/10 backdrop-blur-md">
               <CardHeader>
                 <div className="flex items-center space-x-3">
                   <feature.icon className="h-8 w-8 text-white drop-shadow-lg" />
@@ -65,9 +65,9 @@ const Features = () => {
           ))}
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-lg p-8 mt-16 border border-sopfuel-gray">
+        <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-lg p-8 mt-16 border border-flowforge-gray">
           <h2 className="text-2xl font-bold text-white mb-4 text-center font-montserrat">
-            Why Choose Sopfuel?
+            Why Choose FlowForge?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>

@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Loader2, FileText, Workflow, Info, Sparkles, Save, RotateCcw } from 'lucide-react';
+import { Loader2, FileText, Workflow, Info, Sparkles, Save, RotateCcw, ChevronRight, ChevronLeft, CheckCircle } from 'lucide-react';
 import TagManager from './TagManager';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -38,6 +40,13 @@ interface SOPPreferences {
   language: string;
 }
 
+const steps = [
+  { id: 1, name: 'Basic Info', description: 'Title & Description' },
+  { id: 2, name: 'Details', description: 'Category & Tags' },
+  { id: 3, name: 'Preferences', description: 'Customize Output' },
+  { id: 4, name: 'Review', description: 'Confirm & Generate' },
+];
+
 const SteppedSOPForm: React.FC<SteppedSOPFormProps> = ({
   title,
   setTitle,
@@ -53,6 +62,7 @@ const SteppedSOPForm: React.FC<SteppedSOPFormProps> = ({
   onClearEdit
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [direction, setDirection] = useState(1);
   const [preferences, setPreferences] = useState<SOPPreferences>({
     tone: 'formal',
     outputLength: 'detailed',
@@ -60,6 +70,16 @@ const SteppedSOPForm: React.FC<SteppedSOPFormProps> = ({
     language: 'English'
   });
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  const nextStep = () => {
+    setDirection(1);
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+  };
+
+  const prevStep = () => {
+    setDirection(-1);
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
 
   // Auto-save to localStorage
   useEffect(() => {
@@ -110,82 +130,96 @@ const SteppedSOPForm: React.FC<SteppedSOPFormProps> = ({
     }
   };
 
-  const steps = [
-    { number: 1, title: 'SOP Information', description: 'Basic details about your SOP' },
-    { number: 2, title: 'Tags & Keywords', description: 'Organize and categorize' },
-    { number: 3, title: 'Generation Preferences', description: 'Customize output style' }
-  ];
 
   return (
     <TooltipProvider>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-              <Sparkles className="h-8 w-8 text-primary" />
+      <Card className="w-full max-w-4xl mx-auto overflow-hidden border-0 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 pb-2">
+          <div className="flex flex-col space-y-1.5">
+            <CardTitle className="text-2xl font-bold text-foreground">
               {isEditing ? 'Edit SOP & Workflow' : 'Generate SOP & Workflow'}
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Create comprehensive SOPs with matching visual workflows using AI
-            </p>
-          </div>
-          <div className="flex gap-2">
-            {!isEditing && (
-              <Button variant="outline" onClick={useSampleData} size="sm">
-                <FileText className="h-4 w-4 mr-2" />
-                Use Sample Data
-              </Button>
-            )}
-            {isEditing && onClearEdit && (
-              <Button variant="outline" onClick={clearDraft} size="sm">
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Create New SOP
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Progress Steps */}
-        <div className="flex items-center justify-between mb-8">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex items-center">
-              <div className="flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                  currentStep === step.number 
-                    ? 'bg-primary text-primary-foreground' 
-                    : currentStep > step.number
-                    ? 'bg-green-500 text-white'
-                    : 'bg-muted text-muted-foreground'
-                }`}>
-                  {currentStep > step.number ? '✓' : step.number}
-                </div>
-                <div className="text-center mt-2">
-                  <div className="text-sm font-medium">{step.title}</div>
-                  <div className="text-xs text-muted-foreground hidden sm:block">{step.description}</div>
-                </div>
-              </div>
-              {index < steps.length - 1 && (
-                <div className={`flex-1 h-px mx-4 transition-colors ${
-                  currentStep > step.number ? 'bg-green-500' : 'bg-muted'
-                }`} />
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Step Content */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {currentStep === 1 && <FileText className="h-5 w-5" />}
-              {currentStep === 2 && <Badge className="h-5 w-5" />}
-              {currentStep === 3 && <Sparkles className="h-5 w-5" />}
-              {steps[currentStep - 1].title}
             </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Step 1: SOP Information */}
+            <CardDescription className="text-foreground/80">
+              {steps[currentStep - 1].description}
+            </CardDescription>
+          </div>
+        </CardHeader>
+
+      {/* Progress Steps */}
+      <div className="px-6 pt-4">
+        <nav aria-label="Progress" className="w-full">
+          <ol className="flex items-center justify-between">
+            {steps.map((step, stepIdx) => (
+              <li key={step.name} className="flex-1">
+                <div className="flex flex-col items-center">
+                  <div
+                    className={cn(
+                      'flex h-9 w-full items-center',
+                      stepIdx !== steps.length - 1 ? 'justify-end' : 'justify-center',
+                      stepIdx !== 0 && 'justify-center',
+                      stepIdx === 0 && 'justify-start'
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'relative flex h-8 w-8 items-center justify-center rounded-full',
+                        currentStep > step.id 
+                          ? 'bg-primary text-primary-foreground'
+                          : currentStep === step.id
+                          ? 'border-2 border-primary bg-background text-primary'
+                          : 'border-2 border-muted-foreground/20 bg-background text-muted-foreground',
+                        'transition-colors duration-200 ease-in-out'
+                      )}
+                    >
+                      {currentStep > step.id ? (
+                        <CheckCircle className="h-5 w-5" aria-hidden="true" />
+                      ) : (
+                        <span className={cn(
+                          'font-medium text-sm',
+                          currentStep === step.id ? 'text-primary' : 'text-muted-foreground/70'
+                        )}>
+                          {step.id}
+                        </span>
+                      )}
+                    </span>
+                    {stepIdx !== steps.length - 1 && (
+                      <div 
+                        className={cn(
+                          'h-0.5 flex-1 mx-2',
+                          currentStep > step.id ? 'bg-primary' : 'bg-muted',
+                          'transition-colors duration-300 ease-in-out'
+                        )}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </div>
+                  <div className="mt-2 text-center">
+                    <span className={cn(
+                      'text-xs font-medium',
+                      currentStep >= step.id ? 'text-foreground' : 'text-muted-foreground'
+                    )}>
+                      {step.name}
+                    </span>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </div>
+
+      {/* Step Content */}
+      <CardContent className="pt-6">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={currentStep}
+            custom={direction}
+            initial={{ opacity: 0, x: direction > 0 ? 50 : -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction > 0 ? -50 : 50 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="space-y-6"
+          >
             {currentStep === 1 && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -348,51 +382,56 @@ const SteppedSOPForm: React.FC<SteppedSOPFormProps> = ({
               </div>
             )}
 
-            <Separator />
+            <Separator className="my-6" />
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between pt-4">
+            <div className="flex items-center justify-between pt-4">
               <Button
                 variant="outline"
-                onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-                disabled={currentStep === 1}
+                onClick={prevStep}
+                disabled={currentStep === 1 || isGenerating}
+                className="group flex items-center gap-1.5 transition-all duration-200 hover:bg-primary/10 hover:text-primary"
               >
-                Previous
+                <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+                Back
               </Button>
-
-              <div className="flex gap-2">
-                {currentStep < 3 ? (
-                  <Button
-                    onClick={() => setCurrentStep(Math.min(3, currentStep + 1))}
-                    disabled={!isStepValid(currentStep)}
+              
+              <div className="flex items-center gap-3">
+                {currentStep < steps.length ? (
+                  <Button 
+                    onClick={nextStep}
+                    disabled={isGenerating}
+                    className="group flex items-center gap-1.5 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary transition-all duration-200 shadow-md hover:shadow-lg"
                   >
                     Next
+                    <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Button>
                 ) : (
                   <Button
                     onClick={handleGenerate}
-                    disabled={isGenerating || !title.trim() || !description.trim()}
-                    className="px-8"
+                    disabled={isGenerating}
+                    className="group flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 text-white shadow-md hover:shadow-lg transition-all duration-200"
                   >
                     {isGenerating ? (
                       <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Generating...
                       </>
                     ) : (
                       <>
-                        <Workflow className="h-4 w-4 mr-2" />
-                        Generate SOP & Workflow
+                        <Sparkles className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                        Generate SOP
                       </>
                     )}
                   </Button>
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </TooltipProvider>
+          </motion.div>
+        </AnimatePresence>
+      </CardContent>
+    </Card>
+  </TooltipProvider>
   );
 };
 

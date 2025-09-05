@@ -11,7 +11,7 @@ interface LayoutProps {
   title?: string;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, title = "Sopfuel" }) => {
+const Layout: React.FC<LayoutProps> = ({ children, title = "Flowforge" }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -38,7 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title = "Sopfuel" }) => {
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-8 pt-20">
         <div className="max-w-4xl mx-auto">
-          {title && title !== "Sopfuel" && (
+          {title && title !== "Flowforge" && (
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold font-montserrat text-white mb-8 text-center leading-tight">
               {title}
             </h1>
@@ -59,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title = "Sopfuel" }) => {
                   <Bot className="h-6 w-6 text-brand-blue" />
                 </div>
                 <span className="text-2xl font-bold font-montserrat group-hover:text-[#DDDDDD] transition-colors duration-300">
-                  Sopfuel
+                  Flowforge
                 </span>
               </div>
               <p className="text-[#DDDDDD] font-inter leading-relaxed max-w-md">
@@ -87,7 +87,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title = "Sopfuel" }) => {
           </div>
           <div className="border-t border-white/20 mt-12 pt-8 text-center text-[#DDDDDD]">
             <p className="font-inter">
-              © {new Date().getFullYear()} Sopfuel. All rights reserved.
+              © {new Date().getFullYear()} Flowforge. All rights reserved.
             </p>
           </div>
         </div>

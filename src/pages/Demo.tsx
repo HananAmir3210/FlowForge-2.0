@@ -37,7 +37,7 @@ const Demo = () => {
         </div>
 
         {/* Video Demo Section */}
-        <Card className="overflow-hidden bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="overflow-hidden bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-white font-montserrat">Watch FlowForge in Action</CardTitle>
             <CardDescription className="text-[#EEEEEE] font-inter">
@@ -45,7 +45,7 @@ const Demo = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="relative bg-white/10 backdrop-blur-md rounded-lg aspect-video flex items-center justify-center border border-sopfuel-gray">
+            <div className="relative bg-white/10 backdrop-blur-md rounded-lg aspect-video flex items-center justify-center border border-flowforge-gray">
               <div className="text-center">
                 <Play className="h-16 w-16 text-brand-blue mx-auto mb-4 drop-shadow-lg" />
                 <p className="text-[#EEEEEE] font-inter mb-4">
@@ -59,7 +59,7 @@ const Demo = () => {
 
         {/* Request Demo Form */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+          <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-white font-montserrat">
                 <Calendar className="h-6 w-6 text-brand-blue" />
@@ -141,7 +141,7 @@ const Demo = () => {
           </Card>
 
           <div className="space-y-6">
-            <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+            <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
               <CardHeader>
                 <CardTitle className="text-white font-montserrat">What You'll See</CardTitle>
               </CardHeader>
@@ -191,7 +191,7 @@ const Demo = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+            <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
               <CardHeader>
                 <CardTitle className="text-white font-montserrat">Contact Information</CardTitle>
               </CardHeader>

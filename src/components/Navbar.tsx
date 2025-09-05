@@ -55,7 +55,7 @@ const Navbar = () => {
             <div className="w-10 h-10 bg-brand-blue rounded-xl flex items-center justify-center">
               <Bot className="h-6 w-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white font-montserrat">Sopfuel</span>
+            <span className="text-2xl font-bold text-white font-montserrat">Flowforge</span>
           </div>
           <div className="hidden md:flex items-center space-x-8">
             {['features', 'how-it-works', 'ai-demo', 'pricing', 'faq', 'testimonials', 'contact'].map((section) => (

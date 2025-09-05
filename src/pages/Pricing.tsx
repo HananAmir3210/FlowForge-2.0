@@ -76,7 +76,7 @@ const Pricing = () => {
           {plans.map((plan, index) => (
             <Card
               key={index}
-              className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg"
+              className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg"
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
@@ -128,7 +128,7 @@ const Pricing = () => {
           ))}
         </div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-lg p-8 mt-16 border border-sopfuel-gray">
+        <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-lg p-8 mt-16 border border-flowforge-gray">
           <h2 className="text-white font-montserrat text-2xl font-bold mb-6 text-center">
             Frequently Asked Questions
           </h2>

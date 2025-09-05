@@ -64,7 +64,7 @@ const About = () => {
         </div>
 
         {/* Story Section */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardHeader>
             <CardTitle className="text-white font-montserrat text-2xl text-center">Our Story</CardTitle>
           </CardHeader>
@@ -87,7 +87,7 @@ const About = () => {
 
         {/* Vision & Values */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+          <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Eye className="h-6 w-6" />
@@ -103,11 +103,11 @@ const About = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+          <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Target className="h-6 w-6" />
-                <span>What Drives Us</span>
+                <span>Our Values</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -125,7 +125,7 @@ const About = () => {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Values</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg text-center hover:shadow-lg transition-shadow">
+              <Card key={index} className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg text-center hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex justify-center mb-4">
                     <value.icon className="h-12 w-12 text-blue-600" />
@@ -147,7 +147,7 @@ const About = () => {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Meet Our Team</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((member, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg text-center hover:shadow-lg transition-shadow">
+              <Card key={index} className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg text-center hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <Users className="h-12 w-12 text-gray-400" />

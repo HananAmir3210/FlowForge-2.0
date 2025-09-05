@@ -91,7 +91,7 @@ const Contact = () => {
           {/* Contact Information */}
           <div className="flex flex-col gap-6 h-full">
             {contactInfo.map((info, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg flex-1 flex">
+              <Card key={index} className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg flex-1 flex">
                 <CardContent className="pt-6 flex-1 flex flex-col justify-center">
                   <div className="flex items-start space-x-4">
                     <div className="bg-brand-blue/20 p-3 rounded-lg flex items-center justify-center">
@@ -116,7 +116,7 @@ const Contact = () => {
 
           {/* Contact Form */}
           <div className="flex flex-col h-full">
-            <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg flex-1 flex flex-col justify-center">
+            <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg flex-1 flex flex-col justify-center">
               <CardHeader>
                 <CardTitle className="text-white font-montserrat text-2xl">Get in Touch</CardTitle>
                 <CardDescription className="text-[#EEEEEE] font-inter">
@@ -201,7 +201,7 @@ const Contact = () => {
 
           {/* Support Options */}
           <div className="flex flex-col h-full">
-            <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg flex-1 flex flex-col justify-center">
+            <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg flex-1 flex flex-col justify-center">
               <CardHeader>
                 <CardTitle className="text-white font-montserrat text-2xl">Specific Support</CardTitle>
                 <CardDescription className="text-[#EEEEEE] font-inter">
@@ -234,7 +234,7 @@ const Contact = () => {
         </div>
 
         {/* FAQ Section */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardHeader>
             <CardTitle className="text-white font-montserrat text-2xl text-center">Frequently Asked Questions</CardTitle>
             <CardDescription className="text-[#EEEEEE] font-inter text-center">

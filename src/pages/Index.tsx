@@ -162,22 +162,22 @@ const Index = () => {
 
   const features = useMemo(() => [
     {
-      icon: <Bot className="h-8 w-8 text-sopfuel-blue" />,
+      icon: <Bot className="h-8 w-8 text-flowforge-blue" />,
       title: "AI-Powered Generation",
       description: "Create comprehensive SOPs instantly with advanced AI that understands your business processes and industry requirements."
     },
     {
-      icon: <Workflow className="h-8 w-8 text-sopfuel-blue" />,
+      icon: <Workflow className="h-8 w-8 text-flowforge-blue" />,
       title: "Visual Workflow Builder",
       description: "Design and visualize your processes with our intuitive drag-and-drop workflow builder and real-time collaboration tools."
     },
     {
-      icon: <Users className="h-8 w-8 text-sopfuel-blue" />,
+      icon: <Users className="h-8 w-8 text-flowforge-blue" />,
       title: "Team Collaboration",
       description: "Share, review, and iterate on SOPs with your team in real-time with version control and role-based permissions."
     },
     {
-      icon: <FileText className="h-8 w-8 text-sopfuel-blue" />,
+      icon: <FileText className="h-8 w-8 text-flowforge-blue" />,
       title: "Smart Templates",
       description: "Access industry-specific templates that adapt to your needs, with customizable formats and automated compliance checks."
     }
@@ -215,7 +215,7 @@ const Index = () => {
       name: "Sarah Johnson",
       role: "Operations Director",
       company: "TechFlow",
-      content: "Sopfuel transformed how we document processes. What used to take weeks now takes hours. The AI understands our workflows perfectly.",
+      content: "Flowforge transformed how we document processes. What used to take weeks now takes hours. The AI understands our workflows perfectly.",
       image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
     },
     {
@@ -246,19 +246,19 @@ const Index = () => {
       step: "01",
       title: "Describe Your Process",
       description: "Simply describe your business process or workflow in plain English. Our AI understands natural language and extracts the key components automatically.",
-      icon: <FileText className="h-8 w-8 text-sopfuel-blue" />
+      icon: <FileText className="h-8 w-8 text-flowforge-blue" />
     },
     {
       step: "02", 
       title: "AI Analysis & Generation",
       description: "Our advanced AI analyzes your process, identifies best practices, and generates a comprehensive SOP with proper formatting, structure, and compliance guidelines.",
-      icon: <Bot className="h-8 w-8 text-sopfuel-blue" />
+      icon: <Bot className="h-8 w-8 text-flowforge-blue" />
     },
     {
       step: "03",
       title: "Review & Customize",
       description: "Review the generated SOP, make any customizations, and export in your preferred format. Share with your team and track version history.",
-      icon: <Workflow className="h-8 w-8 text-sopfuel-blue" />
+      icon: <Workflow className="h-8 w-8 text-flowforge-blue" />
     }
   ], []);
 
@@ -268,12 +268,12 @@ const Index = () => {
       answer: "Our AI has been trained on thousands of industry-standard SOPs and continuously learns from user feedback. The generated content is typically 90-95% accurate and follows best practices for process documentation. You can always review and customize the content before finalizing."
     },
     {
-      question: "Can I integrate Sopfuel with my existing tools?",
-      answer: "Yes! Sopfuel offers integrations with popular tools like Slack, Microsoft Teams, Google Workspace, and project management platforms. We also provide API access for custom integrations with your existing systems."
+      question: "Can I integrate Flowforge with my existing tools?",
+      answer: "Yes! Flowforge offers integrations with popular tools like Slack, Microsoft Teams, Google Workspace, and project management platforms. We also provide API access for custom integrations with your existing systems."
     },
     {
       question: "What file formats can I export my SOPs in?",
-      answer: "Sopfuel supports multiple export formats including PDF, Word documents, HTML, and Markdown. You can also generate shareable links for easy collaboration with your team members."
+      answer: "Flowforge supports multiple export formats including PDF, Word documents, HTML, and Markdown. You can also generate shareable links for easy collaboration with your team members."
     },
     {
       question: "Is my data secure and private?",
@@ -281,11 +281,11 @@ const Index = () => {
     },
     {
       question: "Can multiple team members collaborate on the same SOP?",
-      answer: "Yes! Sopfuel supports real-time collaboration with features like version control, commenting, and approval workflows. Multiple team members can work on the same document simultaneously with changes tracked and synchronized."
+      answer: "Yes! Flowforge supports real-time collaboration with features like version control, commenting, and approval workflows. Multiple team members can work on the same document simultaneously with changes tracked and synchronized."
     },
     {
-      question: "What industries does Sopfuel support?",
-      answer: "Sopfuel is designed to work across all industries including manufacturing, healthcare, finance, technology, retail, and more. Our AI adapts to industry-specific terminology and compliance requirements."
+      question: "What industries does Flowforge support?",
+      answer: "Flowforge is designed to work across all industries including manufacturing, healthcare, finance, technology, retail, and more. Our AI adapts to industry-specific terminology and compliance requirements."
     }
   ], []);
 
@@ -890,7 +890,7 @@ const Index = () => {
                   Frequently Asked Questions
                 </motion.h2>
                 <p className="text-xl lg:text-2xl text-[#EEEEEE] max-w-4xl mx-auto font-inter font-medium">
-                  Everything you need to know about Sopfuel and AI-powered SOP generation
+                  Everything you need to know about Flowforge and AI-powered SOP generation
                 </p>
             </AnimatedSection>
             
@@ -965,7 +965,7 @@ const Index = () => {
                 What Our Users Say
               </motion.h2>
                 <p className="text-xl lg:text-2xl text-[#EEEEEE] max-w-4xl mx-auto font-inter font-medium">
-                Join thousands of teams who've transformed their operations with Sopfuel
+                Join thousands of teams who've transformed their operations with Flowforge
               </p>
             </AnimatedSection>
             
@@ -1126,9 +1126,9 @@ const Index = () => {
                 </p>
                 <div className="flex justify-center space-x-8">
                   {[
-                    { icon: Linkedin, href: "https://linkedin.com/company/sopfuel", label: "LinkedIn" },
-                    { icon: Twitter, href: "https://twitter.com/sopfuel", label: "Twitter" },
-                    { icon: Facebook, href: "https://facebook.com/sopfuel", label: "Facebook" }
+                    { icon: Linkedin, href: "https://linkedin.com/company/flowforge", label: "LinkedIn" },
+                    { icon: Twitter, href: "https://twitter.com/flowforge", label: "Twitter" },
+                    { icon: Facebook, href: "https://facebook.com/flowforge", label: "Facebook" }
                   ].map((social, index) => (
                     <a
                       key={index}
@@ -1164,7 +1164,7 @@ const Index = () => {
                     <Bot className="h-6 w-6 text-brand-blue" />
                   </div>
                   <span className="text-2xl font-bold font-montserrat group-hover:text-[#DDDDDD] transition-colors duration-300">
-                    Sopfuel
+                    Flowforge
                   </span>
                 </div>
                 <p className="text-[#DDDDDD] font-inter leading-relaxed max-w-md">
@@ -1216,7 +1216,7 @@ const Index = () => {
               transition={{ duration: 0.8 }}
             >
               <p className="font-inter">
-                © {new Date().getFullYear()} Sopfuel. All rights reserved.
+                © {new Date().getFullYear()} Flowforge. All rights reserved.
               </p>
             </motion.div>
           </div>

@@ -101,7 +101,7 @@ const Careers = () => {
         </div>
 
         {/* Company Stats */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardContent className="pt-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
@@ -147,7 +147,7 @@ const Careers = () => {
         </div>
 
         {/* Values */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardHeader>
             <CardTitle className="text-white font-montserrat text-2xl text-center">Our Values</CardTitle>
             <CardDescription className="text-[#EEEEEE] font-inter text-center">

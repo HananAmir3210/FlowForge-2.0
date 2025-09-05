@@ -17,7 +17,7 @@ const ApiDocs = () => {
         </div>
 
         {/* Quick Start */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardHeader>
             <CardTitle className="text-white font-montserrat flex items-center space-x-2">
               <Zap className="h-6 w-6 text-white drop-shadow-lg" />
@@ -48,7 +48,7 @@ const ApiDocs = () => {
 
         {/* Endpoints */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+          <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
             <CardHeader>
               <CardTitle className="text-white font-montserrat flex items-center space-x-2">
                 <Code className="h-6 w-6 text-white drop-shadow-lg" />
@@ -108,7 +108,7 @@ const ApiDocs = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+          <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
             <CardHeader>
               <CardTitle className="text-white font-montserrat flex items-center space-x-2">
                 <Book className="h-6 w-6 text-white drop-shadow-lg" />
@@ -161,7 +161,7 @@ const ApiDocs = () => {
 
         {/* Rate Limits & API Keys */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+          <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
             <CardHeader>
               <CardTitle className="text-white font-montserrat flex items-center space-x-2">
                 <Key className="h-6 w-6 text-white drop-shadow-lg" />
@@ -180,7 +180,7 @@ const ApiDocs = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+          <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
             <CardHeader>
               <CardTitle className="text-white font-montserrat">Rate Limits</CardTitle>
             </CardHeader>
@@ -207,7 +207,7 @@ const ApiDocs = () => {
         </div>
 
         {/* SDKs and Examples */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg">
           <CardHeader>
             <CardTitle className="text-white font-montserrat">SDKs and Code Examples</CardTitle>
             <CardDescription className="text-[#EEEEEE] font-inter">

@@ -24,7 +24,7 @@ const Documentation = () => {
     {
       id: 1,
       title: "Quick Start Guide",
-      description: "Get up and running with Sopfuel in under 10 minutes",
+      description: "Get up and running with Flowforge in under 10 minutes",
       section: "Getting Started",
       icon: Zap,
       readTime: "5 min",
@@ -35,7 +35,7 @@ const Documentation = () => {
     {
       id: 2,
       title: "Account Setup and Configuration",
-      description: "Complete guide to setting up your Sopfuel account and workspace",
+      description: "Complete guide to setting up your Flowforge account and workspace",
       section: "Platform Setup",
       icon: Settings,
       readTime: "10 min",
@@ -121,7 +121,7 @@ const Documentation = () => {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Beginner': return 'bg-sopfuel-green text-white';
+      case 'Beginner': return 'bg-flowforge-green text-white';
       case 'Intermediate': return 'bg-yellow-500 text-white';
       case 'Advanced': return 'bg-red-500 text-white';
       default: return 'bg-gray-500 text-white';
@@ -144,7 +144,7 @@ const Documentation = () => {
             Documentation
           </h2>
           <p className="text-xl text-[#EEEEEE] font-inter max-w-4xl mx-auto">
-            Everything you need to know about using Sopfuel effectively. From basic setup to advanced 
+            Everything you need to know about using Flowforge effectively. From basic setup to advanced 
             features, find comprehensive guides and technical documentation.
           </p>
         </div>
@@ -163,19 +163,19 @@ const Documentation = () => {
         {/* Quick Links */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {quickLinks.map((link, index) => (
-            <Card key={index} className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl group hover:-translate-y-1 cursor-pointer">
+            <Card key={index} className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl group hover:-translate-y-1 cursor-pointer">
               <CardContent className="pt-6 text-center">
-                <div className="p-3 bg-sopfuel-blue/5 rounded-2xl group-hover:bg-sopfuel-blue/10 transition-colors w-fit mx-auto mb-3">
-                  <link.icon className="h-6 w-6 text-sopfuel-blue" />
+                <div className="p-3 bg-flowforge-blue/5 rounded-2xl group-hover:bg-flowforge-blue/10 transition-colors w-fit mx-auto mb-3">
+                  <link.icon className="h-6 w-6 text-flowforge-blue" />
                 </div>
-                <h3 className="font-semibold text-sopfuel-blue mb-1 font-montserrat">
+                <h3 className="font-semibold text-flowforge-blue mb-1 font-montserrat">
                   {link.title}
                 </h3>
-                <p className="text-sm text-sopfuel-dark/70 font-open-sans">
+                <p className="text-sm text-flowforge-dark/70 font-open-sans">
                   {link.description}
                 </p>
                 {link.external && (
-                  <ExternalLink className="h-4 w-4 text-sopfuel-blue/50 mx-auto mt-2" />
+                  <ExternalLink className="h-4 w-4 text-flowforge-blue/50 mx-auto mt-2" />
                 )}
               </CardContent>
             </Card>
@@ -186,9 +186,9 @@ const Documentation = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
-            <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg rounded-2xl sticky top-4">
+            <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg rounded-2xl sticky top-4">
               <CardHeader>
-                <CardTitle className="text-white font-montserrat text-sopfuel-blue">
+                <CardTitle className="text-white font-montserrat text-flowforge-blue">
                   Sections
                 </CardTitle>
               </CardHeader>
@@ -200,8 +200,8 @@ const Documentation = () => {
                     onClick={() => setSelectedSection(section)}
                     className={`w-full justify-start rounded-xl font-open-sans ${
                       selectedSection === section 
-                        ? 'bg-sopfuel-blue text-white' 
-                        : 'text-sopfuel-dark hover:bg-sopfuel-blue/5'
+                        ? 'bg-flowforge-blue text-white' 
+                        : 'text-flowforge-dark hover:bg-flowforge-blue/5'
                     }`}
                   >
                     {section}
@@ -216,15 +216,15 @@ const Documentation = () => {
           <div className="lg:col-span-3">
             <div className="space-y-6">
               {filteredItems.map((item) => (
-                <Card key={item.id} className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl group hover:-translate-y-1">
+                <Card key={item.id} className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl group hover:-translate-y-1">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-sopfuel-blue/5 rounded-2xl group-hover:bg-sopfuel-blue/10 transition-colors">
-                          <item.icon className="h-6 w-6 text-sopfuel-blue" />
+                        <div className="p-3 bg-flowforge-blue/5 rounded-2xl group-hover:bg-flowforge-blue/10 transition-colors">
+                          <item.icon className="h-6 w-6 text-flowforge-blue" />
                         </div>
                         <div className="flex-1">
-                          <CardTitle className="text-white font-montserrat text-sopfuel-blue mb-2">
+                          <CardTitle className="text-white font-montserrat text-flowforge-blue mb-2">
                             {item.title}
                           </CardTitle>
                           <CardDescription className="text-[#EEEEEE] font-inter leading-relaxed">
@@ -239,7 +239,7 @@ const Documentation = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-4 text-sm text-sopfuel-dark/70 font-open-sans">
+                      <div className="flex items-center space-x-4 text-sm text-flowforge-dark/70 font-open-sans">
                         <span>{item.readTime} read</span>
                         <span>•</span>
                         <span>{item.section}</span>
@@ -248,7 +248,7 @@ const Documentation = () => {
                     
                     <div className="flex flex-wrap gap-2 mb-4">
                       {item.tags.map((tag, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs bg-sopfuel-gray text-sopfuel-dark">
+                        <Badge key={index} variant="secondary" className="text-xs bg-flowforge-gray text-flowforge-dark">
                           {tag}
                         </Badge>
                       ))}
@@ -256,7 +256,7 @@ const Documentation = () => {
 
                     <div className="flex gap-2">
                       <Button 
-                        className="bg-sopfuel-blue hover:bg-sopfuel-blue/90 text-white rounded-xl font-open-sans"
+                        className="bg-flowforge-blue hover:bg-flowforge-blue/90 text-white rounded-xl font-open-sans"
                       >
                         Read Guide
                         <ChevronRight className="h-4 w-4 ml-1" />
@@ -277,11 +277,11 @@ const Documentation = () => {
             {/* No Results */}
             {filteredItems.length === 0 && (
               <div className="text-center py-12">
-                <BookOpen className="h-16 w-16 text-sopfuel-blue/30 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-sopfuel-blue mb-2 font-montserrat">
+                <BookOpen className="h-16 w-16 text-flowforge-blue/30 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-flowforge-blue mb-2 font-montserrat">
                   No documentation found
                 </h3>
-                <p className="text-sopfuel-dark/70 font-open-sans">
+                <p className="text-flowforge-dark/70 font-open-sans">
                   Try adjusting your search or browse different sections
                 </p>
               </div>
@@ -290,13 +290,13 @@ const Documentation = () => {
         </div>
 
         {/* Help Section */}
-        <Card className="bg-white/10 backdrop-blur-md border border-sopfuel-gray text-white shadow-lg rounded-2xl">
+        <Card className="bg-white/10 backdrop-blur-md border border-flowforge-gray text-white shadow-lg rounded-2xl">
           <CardContent className="pt-8 text-center">
             <h3 className="text-2xl font-bold mb-4 font-montserrat text-white">
               Still Need Help?
             </h3>
             <p className="text-[#EEEEEE] mb-6 max-w-2xl mx-auto font-open-sans">
-              Can't find what you're looking for? Our support team is here to help you get the most out of Sopfuel.
+              Can't find what you're looking for? Our support team is here to help you get the most out of Flowforge.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Button className="btn-premium font-montserrat text-white text-lg shadow-xl px-8 py-3 rounded-xl">Contact Support</Button>
